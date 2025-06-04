@@ -47,6 +47,17 @@
             border-top: 1px solid #ddd;
             padding-top: 20px;
         }
+
+        .admin {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .admin input {
+            padding: 4px;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -62,5 +73,25 @@
         ご不明な点があれば、Wechat: oushidou040129 にご連絡ください。<br>
         このページは作成中のため、不備があればご容赦ください。問題があればご連絡をお願いします。
     </p>
+
+    <div class="admin">
+        🔒 管理用：パスワードを入力してください：<br>
+        <input type="password" id="adminPass" placeholder="パスワード">
+        <button onclick="checkAdmin()">確認</button>
+        <div id="adminLink" style="display:none; margin-top:5px;">
+            <a href="q/decode.html" style="color:#555; font-size:12px;">▶ 管理人ページ：コード解読へ</a>
+        </div>
+    </div>
+
+    <script>
+      function checkAdmin() {
+        const input = document.getElementById('adminPass').value;
+        if (input === 'decode') {
+          document.getElementById('adminLink').style.display = 'block';
+        } else {
+          alert('パスワードが間違っています');
+        }
+      }
+    </script>
 </body>
 </html>

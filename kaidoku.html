@@ -2,12 +2,12 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>答えコードの解読ツール</title>
+  <title>確認コード解読ツール（自動対応）</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
     input { width: 300px; font-size: 16px; padding: 5px; }
     button { padding: 6px 12px; margin-left: 10px; }
-    .result { margin-top: 20px; white-space: pre-wrap; }
+    .result { margin-top: 20px; white-space: pre-wrap; background: #f0f0f0; padding: 10px; border-radius: 6px; }
   </style>
 </head>
 <body>
@@ -26,14 +26,12 @@
         return;
       }
 
-      let bin = BigInt(decimal).toString(2).padStart(29, '0'); // 29 = 总题数
-      const topics = ['s1','k1','k2','k3','k4','k5'];
-      for (let i = 1; i <= 15; i++) topics.push(`g${i}`);
-      for (let i = 1; i <= 8; i++) topics.push(`y${i}`);
+      let bin = BigInt(decimal).toString(2);
+      let result = `合計 ${bin.length} 問の結果：\n\n`;
 
-      let result = '';
-      for (let i = 0; i < bin.length && i < topics.length; i++) {
-        result += `問${i + 1}：${bin[i] === '1' ? '✔' : '✘'}\n`;
+      for (let i = 0; i < bin.length; i++) {
+        const mark = bin[i] === '1' ? '✔（正解）' : '✘（不正解）';
+        result += `問${i + 1}：${mark}\n`;
       }
 
       document.getElementById('output').textContent = result;

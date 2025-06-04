@@ -115,8 +115,9 @@
         }
       }
 
-      // 二進制轉為十進制數字
-      const decimalCode = BigInt('0b' + binaryString).toString();
+      // 在前面加 '1' 作为补位，防止前导0丢失
+      const encodedBinary = '1' + binaryString;
+      const decimalCode = BigInt('0b' + encodedBinary).toString();
       document.getElementById('resultCode').textContent = decimalCode;
     });
   </script>

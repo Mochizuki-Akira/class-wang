@@ -128,8 +128,9 @@
     return;
   }
 
-  navigator.clipboard.writeText(code).then(() => {
-    alert('コードをコピーしました！');
+  const fullText = '問題確認コード：' + code;
+  navigator.clipboard.writeText(fullText).then(() => {
+    alert('コピーしました！\n\n' + fullText);
   }).catch(err => {
     alert('コピーに失敗しました: ' + err);
   });

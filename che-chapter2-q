@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>選択問題チェック</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+      background: #f8f8f8;
+    }
+    h2 {
+      color: #003366;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 4px;
+    }
+    .section {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px #ccc;
+    }
+    .question {
+      margin: 5px 0;
+    }
+    input {
+      width: 40px;
+      padding: 4px;
+      font-size: 16px;
+    }
+    .result {
+      display: inline-block;
+      margin-left: 10px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>選択問題チェックシステム</h1>
+
+  <form id="quizForm">
+
+    <div class="section">
+      <h2>状態の変化</h2>
+      <div class="question">問1：<input type="number" name="s1" min="1" max="6"> <span class="result" id="r-s1"></span></div>
+    </div>
+
+    <div class="section">
+      <h2>固体の構造</h2>
+      <div class="question">問1：<input type="number" name="k1" min="1" max="6"> <span class="result" id="r-k1"></span></div>
+      <div class="question">問2：<input type="number" name="k2" min="1" max="6"> <span class="result" id="r-k2"></span></div>
+      <div class="question">問3：<input type="number" name="k3" min="1" max="6"> <span class="result" id="r-k3"></span></div>
+      <div class="question">問4：<input type="number" name="k4" min="1" max="6"> <span class="result" id="r-k4"></span></div>
+      <div class="question">問5：<input type="number" name="k5" min="1" max="6"> <span class="result" id="r-k5"></span></div>
+    </div>
+
+    <div class="section">
+      <h2>気体の性質</h2>
+      <!-- 問1〜15 -->
+      <script>
+        for (let i = 1; i <= 15; i++) {
+          document.write(`<div class="question">問${i}：<input type="number" name="g${i}" min="1" max="6"> <span class="result" id="r-g${i}"></span></div>`);
+        }
+      </script>
+    </div>
+
+    <div class="section">
+      <h2>溶液の性質</h2>
+      <div class="question">問1：<input type="number" name="y1" min="1" max="6"> <span class="result" id="r-y1"></span></div>
+      <div class="question">問2：<input type="number" name="y2" min="1" max="6"> <span class="result" id="r-y2"></span></div>
+      <div class="question">問3：<input type="number" name="y3" min="1" max="6"> <span class="result" id="r-y3"></span></div>
+      <div class="question">問4：<input type="number" name="y4" min="1" max="6"> <span class="result" id="r-y4"></span></div>
+      <div class="question">問5：<input type="number" name="y5" min="1" max="6"> <span class="result" id="r-y5"></span></div>
+      <div class="question">問6：<input type="number" name="y6" min="1" max="6"> <span class="result" id="r-y6"></span></div>
+      <div class="question">問7：<input type="number" name="y7" min="1" max="6"> <span class="result" id="r-y7"></span></div>
+      <div class="question">問8：<input type="number" name="y8" min="1" max="6"> <span class="result" id="r-y8"></span></div>
+    </div>
+
+    <button type="submit">答え合わせ</button>
+  </form>
+
+  <script>
+    const answers = {
+      s1: 2,
+      k1: 4, k2: 4, k3: 6, k4: 1, k5: 2,
+      g1: 3, g2: 4, g3: 5, g4: 5, g5: 2,
+      g6: 4, g7: 3, g8: 2, g9: 6, g10: 4,
+      g11: 5, g12: 4, g13: 6, g14: 3, g15: 1,
+      y1: 5, y2: 5, y3: 3, y4: 4, y5: 1,
+      y6: 4, y7: 3, y8: 4
+    };
+
+    document.getElementById('quizForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      for (const key in answers) {
+        const input = document.querySelector(`[name="${key}"]`);
+        const result = document.getElementById(`r-${key}`);
+        if (input) {
+          const userAnswer = input.value.trim();
+          if (userAnswer === answers[key].toString()) {
+            result.textContent = '✅';
+            result.style.color = 'green';
+          } else {
+            result.textContent = `❌（正解：${answers[key]}）`;
+            result.style.color = 'red';
+          }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

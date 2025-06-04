@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>確認コード解読ツール</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input { width: 320px; font-size: 16px; padding: 6px; }
+    button { padding: 6px 12px; margin-left: 10px; }
+    .result { margin-top: 20px; white-space: pre-wrap; background: #f7f7f7; padding: 10px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>確認コード解読ツール</h1>
+  <p>学生から送られた十進数コードを入力してください：</p>
+  <input type="text" id="codeInput" placeholder="例：29234723947">
+  <button onclick="decode()">解読</button>
+
+  <div class="result" id="output"></div>
+
+  <script>
+    function decode() {
+      const decimal = document.getElementById('codeInput').value.trim();
+      const output = document.getElementById('output');
+      if (!/^[0-9]+$/.test(decimal)) {
+        output.textContent = '⚠️ 数字だけを入力してください。';
+        return;
+      }
+
+      let bin = BigInt(decimal).toString(2);
+
+      if (bin[0] !== '1') {
+        output.textContent = '⚠️ 無効なコード（先頭が1ではありません）';
+        return;
+      }
+
+      let result = '';
+      const cleanBin = bin.slice(1); // 最初の1を削除（位置合わせ用）
+
+      result += `合計 ${cleanBin.length} 問の結果：\n\n`;
+      for (let i = 0; i < cleanBin.length; i++) {
+        const mark = cleanBin[i] === '1' ? '✔（正解）' : '✘（不正解）';
+        result += `問${i + 1}：${mark}\n`;
+      }
+
+      output.textContent = result;
+    }
+  </script>
+</body>
+</html>

@@ -66,9 +66,9 @@
           const sel = document.querySelector(`input[name="${key}"]:checked`);
           const result = document.getElementById(`r-${key}`);
           if (sel && parseInt(sel.value) === answers[key]) {
-            result.textContent = '✅'; result.style.color = 'green'; bin += '1';
+            bin += '1';
           } else {
-            result.textContent = sel ? '❌' : '未選択'; result.style.color = sel ? 'red' : 'gray'; bin += '0';
+            bin += '0';
           }
         }
         const full = '1' + bin;

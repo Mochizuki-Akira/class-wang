@@ -78,8 +78,9 @@
   </form>
 
   <div id="codeArea">
-    あなたの確認コード：<code id="resultCode">（まだ生成されていません）</code>
-  </div>
+  問題確認コード：<code id="resultCode">（まだ生成されていません）</code>
+  <button id="copyBtn" style="margin-left: 10px;">📋 コピー</button>
+</div>
 
   <script>
     const answers = {
@@ -120,6 +121,19 @@
       const decimalCode = BigInt('0b' + encodedBinary).toString();
       document.getElementById('resultCode').textContent = decimalCode;
     });
+    document.getElementById('copyBtn').addEventListener('click', function () {
+  const code = document.getElementById('resultCode').textContent;
+  if (code.includes('生成されていません')) {
+    alert('まだコードが生成されていません。');
+    return;
+  }
+
+  navigator.clipboard.writeText(code).then(() => {
+    alert('コードをコピーしました！');
+  }).catch(err => {
+    alert('コピーに失敗しました: ' + err);
+  });
+});
   </script>
 
 </body>

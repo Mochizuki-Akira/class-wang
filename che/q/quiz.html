@@ -54,6 +54,11 @@
         form.appendChild(sec);
       });
 
+      const submitBtn = document.createElement('button');
+      submitBtn.type = 'submit';
+      submitBtn.textContent = '答え合わせ';
+      form.appendChild(submitBtn);
+
       form.addEventListener('submit', e => {
         e.preventDefault();
         let bin = '';
@@ -89,7 +94,7 @@
 </head>
 <body>
   <form id="quizForm"></form>
-  <button type="submit">答え合わせ</button>
+
   <div id="codeArea">
     問題確認コード：<code id="resultCode">（まだ生成されていません）</code>
     <button id="copyBtn">📋 コピー</button>

@@ -28,20 +28,27 @@
       }
 
       let bin = BigInt(decimal).toString(2);
-
       if (bin[0] !== '1') {
         output.textContent = '⚠️ 無効なコード（先頭が1ではありません）';
         return;
       }
 
-      let result = '';
-      const cleanBin = bin.slice(1); // 最初の1を削除（位置合わせ用）
+      const cleanBin = bin.slice(1); // 最初の1を削除（位置合わせ）
+      let total = cleanBin.length;
+      let wrong = 0;
+      let result = `合計 ${total} 問のうち、間違えた問題は：\n\n`;
 
-      result += `合計 ${cleanBin.length} 問の結果：\n\n`;
       for (let i = 0; i < cleanBin.length; i++) {
-        const mark = cleanBin[i] === '1' ? '✔（正解）' : '✘（不正解）';
-        result += `問${i + 1}：${mark}\n`;
+        if (cleanBin[i] === '0') {
+          wrong++;
+          result += `問${i + 1}：✘\n`;
+        }
       }
+
+      const correct = total - wrong;
+      const rate = ((correct / total) * 100).toFixed(1);
+
+      result += `\n正答率：${rate}%（${correct} / ${total}）`;
 
       output.textContent = result;
     }

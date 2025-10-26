@@ -10,23 +10,23 @@
     .question { margin: 8px 0; }
     .options label { margin-right: 10px; }
     .result { margin-left: 10px; font-weight: bold; display: inline-block; }
-    button { padding: 8px 16px; margin-top: 20px; font-size: 16px; }
+    button { padding: 8px 16px; margin-top: 20px; font-size: 16px; cursor:pointer; }
     #codeArea { margin-top: 20px; font-size: 18px; }
+    #qrcode { margin-top: 15px; }
   </style>
+  <!-- 引入轻量级二维码库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script>
-    // 解析クエリパラメータ
     function getQueryParam(name) {
       const url = new URL(location.href);
       return url.searchParams.get(name);
     }
 
-    // データ読み込みとロジック初期化
     async function initQuiz() {
       const chapter = getQueryParam('chapter') || 'ch1';
       const script = document.createElement('script');
       script.src = `data-${chapter}.js`;
       document.head.appendChild(script);
-
       script.onload = () => renderQuiz(window.chapterData);
     }
 
@@ -40,17 +40,18 @@
         const sec = document.createElement('div');
         sec.className = 'section';
         sec.innerHTML = `<h2>${section.subtitle}</h2>`;
-
         section.questions.forEach((q, idx) => {
           answers[q.name] = q.answer;
           const qdiv = document.createElement('div');
           qdiv.className = 'question';
-          qdiv.innerHTML = `${q.label}：` + [...Array(6)].map((_, j) =>
-            `<label><input type="radio" name="${q.name}" value="${j + 1}">${j + 1}</label>`
-          ).join(' ') + ` <span class="result" id="r-${q.name}"></span>`;
+          qdiv.innerHTML =
+            `${q.label}：` +
+            [...Array(6)].map((_, j) =>
+              `<label><input type="radio" name="${q.name}" value="${j + 1}">${j + 1}</label>`
+            ).join(' ') +
+            ` <span class="result" id="r-${q.name}"></span>`;
           sec.appendChild(qdiv);
         });
-
         form.appendChild(sec);
       });
 
@@ -78,6 +79,7 @@
         const full = '1' + bin;
         const code = BigInt('0b' + full).toString();
         document.getElementById('resultCode').textContent = code;
+        generateQR(code);
       });
 
       document.getElementById('copyBtn').addEventListener('click', () => {
@@ -93,6 +95,20 @@
       });
     }
 
+    // 生成二维码
+    function generateQR(text) {
+      const qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = '';
+      const qr = new QRious({
+        element: document.createElement('canvas'),
+        value: text,
+        size: 200,
+        background: 'white',
+        foreground: '#003366'
+      });
+      qrContainer.appendChild(qr.element);
+    }
+
     window.addEventListener('DOMContentLoaded', initQuiz);
   </script>
 </head>
@@ -102,6 +118,7 @@
   <div id="codeArea">
     問題確認コード：<code id="resultCode">（まだ生成されていません）</code>
     <button id="copyBtn">📋 コピー</button>
+    <div id="qrcode"></div>
   </div>
 </body>
 </html>

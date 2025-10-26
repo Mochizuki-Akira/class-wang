@@ -7,37 +7,63 @@
   <link rel="stylesheet" href="../common/style.css">
 
   <style>
-    /* 折叠（details/summary）外观微调，保持与你站点风格一致 */
-    details { border: 1px solid var(--color-border); border-radius: 12px; background:#fff; }
-    details + details { margin-top: var(--space-4); }
-    summary {
+    /* ====== 折叠组件：让 summary 看起来就是“带边框按钮” ====== */
+    details.fold { border: none; padding: 0; background: transparent; }
+    details.fold + details.fold { margin-top: var(--space-4); }
+
+    /* 标题（summary）按钮外观 */
+    details.fold > summary {
       list-style: none;
+      display: block;
       cursor: pointer;
       padding: 14px 16px;
+      border: 2px solid var(--color-primary);
+      border-radius: 12px;
+      color: var(--color-primary);
       font-weight: 700;
       font-size: 1.05rem;
-      color: var(--color-primary-700);
-      display: flex; align-items: center; gap: 10px;
+      background: #fff;
+      transition: background .2s ease, box-shadow .2s ease, transform .05s ease;
     }
-    summary::-webkit-details-marker { display: none; }
-    .chev { transition: transform .2s ease; }
-    details[open] .chev { transform: rotate(90deg); }
+    details.fold > summary:hover {
+      background-color: rgba(74,144,226,0.08);
+      box-shadow: 0 4px 10px rgba(74,144,226,0.25);
+    }
+    details.fold > summary:active { transform: translateY(1px); }
+    details.fold > summary::-webkit-details-marker { display: none; }
 
-    .btn-list { display:flex; flex-direction:column; gap:12px; padding: 0 16px 16px 16px; }
-    .btn-outline.btn--lg, .btn-outline.btn-outline-large { display:block; text-align:center; }
+    /* 展开时标题与下面面板连体 */
+    details.fold[open] > summary {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
 
-    /* 二层折叠（第2回） */
-    .sub > summary { font-size: 1rem; padding: 10px 16px; color: var(--color-primary); }
-    .sub { margin: 0 12px 12px 12px; border-radius: 10px; }
+    /* 面板主体 */
+    .fold-body {
+      border: 2px solid var(--color-primary);
+      border-top: none;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      padding: 14px 16px 16px 16px;
+      background: #fff;
+    }
+    details.fold:not([open]) > .fold-body { display: none; }
+
+    /* 小箭头 */
+    .chev { display:inline-block; margin-right: 6px; transition: transform .2s ease; }
+    details.fold[open] .chev { transform: rotate(90deg); }
+
+    /* 按钮列表 */
+    .btn-list { display:flex; flex-direction:column; gap:12px; }
+    .btn-outline.btn--lg, .btn-outline.btn-outline-large { display:block; text-align:center; width:100%; }
+
+    /* 内层（二层）折叠：稍小一点 */
+    details.fold.sub > summary { font-size: 1rem; padding: 10px 14px; }
+    details.fold.sub .fold-body { padding: 10px 14px 14px; }
 
     /* 课程表 */
-    .syllabus {
-      width: 100%; border-collapse: collapse; font-size: var(--fs-sm);
-    }
-    .syllabus th, .syllabus td {
-      border: 1px solid var(--color-border);
-      padding: 10px 12px; text-align: left; background:#fff;
-    }
+    .syllabus { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+    .syllabus th, .syllabus td { border: 1px solid var(--color-border); padding: 10px 12px; text-align: left; background:#fff; }
     .syllabus thead th { background: #e6f0ff; color:#2e69a0; font-weight:700; }
     .syllabus .date { white-space: nowrap; }
     @media (max-width: 640px) {
@@ -54,47 +80,53 @@
       <h2 class="text-center">2510基础班 クラス講義ファイル</h2>
       <p class="text-muted text-center">以下の資料はクラス専用です。リンクをクリックするとページ内で表示されます（モバイルは直開）。</p>
 
-      <!-- 一、讲义文件 -->
-      <details open>
+      <!-- 一、講義ファイル -->
+      <details class="fold" open>
         <summary><span class="chev">▶</span> 一、講義ファイル</summary>
-        <div class="btn-list">
-          <!-- 第1回 -->
-          <a href="viewer.html?id=2510_1" class="btn-outline btn--lg">第1回：原子構造と周期表</a>
+        <div class="fold-body">
+          <div class="btn-list">
+            <!-- 第1回 -->
+            <a href="viewer.html?id=2510_1" class="btn-outline btn--lg">第1回：原子構造と周期表</a>
 
-          <!-- 第2回：包含两个文件 → 二层折叠 -->
-          <details class="sub">
-            <summary><span class="chev">▶</span> 第2回：化学結合（2ファイル）</summary>
-            <div class="btn-list" style="padding-top:8px;">
-              <a href="viewer.html?id=2510_2" class="btn-outline">第2回(1)：化学結合</a>
-              <a href="viewer.html?id=2510_3" class="btn-outline">第2回(2)：結晶格子</a>
-            </div>
-          </details>
+            <!-- 第2回：包含两个文件 → 内层折叠 -->
+            <details class="fold sub">
+              <summary><span class="chev">▶</span> 第2回：化学結合（2ファイル）</summary>
+              <div class="fold-body">
+                <div class="btn-list">
+                  <a href="viewer.html?id=2510_2" class="btn-outline">第2回(1)：化学結合</a>
+                  <a href="viewer.html?id=2510_3" class="btn-outline">第2回(2)：結晶格子</a>
+                </div>
+              </div>
+            </details>
+          </div>
         </div>
       </details>
 
-      <!-- 二、作业文件（示例：你上传后在 viewer 的 FILES 里补映射即可） -->
-      <details>
+      <!-- 二、宿題ファイル（示例占位） -->
+      <details class="fold">
         <summary><span class="chev">▶</span> 二、宿題ファイル</summary>
-        <div class="btn-list">
-          <!-- 这里的 id 只是示例。你上传后，在 viewer.html 的 FILES 里添加：
-               '2510_hw1': 'assets/homework/2510/hw_1.pdf'  等映射即可 -->
-          <a href="viewer.html?id=2510_hw1" class="btn-outline">第1回 宿題</a>
+        <div class="fold-body">
+          <div class="btn-list">
+            <a href="viewer.html?id=2510_hw1" class="btn-outline">第1回 宿題</a>
 
-          <!-- 二层折叠示例（若某次作业也有两个文件） -->
-          <details class="sub">
-            <summary><span class="chev">▶</span> 第2回 宿題（2ファイル）</summary>
-            <div class="btn-list" style="padding-top:8px;">
-              <a href="viewer.html?id=2510_hw2a" class="btn-outline">第2回 宿題 A</a>
-              <a href="viewer.html?id=2510_hw2b" class="btn-outline">第2回 宿題 B</a>
-            </div>
-          </details>
+            <!-- 若第2回有两个作业文件，可用此内层折叠 -->
+            <details class="fold sub">
+              <summary><span class="chev">▶</span> 第2回 宿題（2ファイル）</summary>
+              <div class="fold-body">
+                <div class="btn-list">
+                  <a href="viewer.html?id=2510_hw2a" class="btn-outline">第2回 宿題 A</a>
+                  <a href="viewer.html?id=2510_hw2b" class="btn-outline">第2回 宿題 B</a>
+                </div>
+              </div>
+            </details>
+          </div>
         </div>
       </details>
 
-      <!-- 三、课程大纲（根据你提供图片内容整理） -->
-      <details>
+      <!-- 三、コース概要（時間割・内容） -->
+      <details class="fold">
         <summary><span class="chev">▶</span> 三、コース概要（時間割・内容）</summary>
-        <div style="padding: 0 16px 16px 16px;">
+        <div class="fold-body">
           <table class="syllabus">
             <thead>
               <tr>
@@ -121,7 +153,7 @@
       </details>
 
       <div class="notice" style="margin-top:24px;">
-        ご不明点は Wechat: oushidou040129 まで。<br>
+        ご不明点は Wechat: oushidou040129 まで。
       </div>
     </section>
   </main>

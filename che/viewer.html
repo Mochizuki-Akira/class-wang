@@ -1,72 +1,26 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>講義ファイル閲覧｜学習小屋</title>
-  <link rel="stylesheet" href="../common/style.css">
+  <link rel="stylesheet" href="../common/style.css" />
   <style>
-    html, body {
-      height: 100%;
-      width: 100%;
-      margin: 0;
-      background: #000;
-      overflow: hidden;
-    }
-    #pdfFrame {
-      width: 100vw;
-      height: 100vh;
-      border: none;
-      background: #fff;
-    }
-    .overlay {
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      z-index: 10;
-    }
-    .btn {
-      display: inline-block;
-      padding: 8px 14px;
-      border: 1px solid #fff;
-      border-radius: 8px;
-      color: #fff;
-      text-decoration: none;
-      font-size: 14px;
-      background: rgba(255,255,255,0.08);
-    }
-    #fallback {
-      position: fixed; inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: #fff;
-      background: rgba(0,0,0,0.6);
-      z-index: 20;
-      padding: 24px;
-    }
-    #fallback .btn {
-      border-color:#4a90e2; color:#fff; background:#4a90e2; margin-top:12px;
-    }
+    html, body { height:100%; width:100%; margin:0; background:#000; overflow:hidden; }
+    .overlay { position:fixed; top:14px; left:14px; z-index:10; }
+    .btn { display:inline-block; padding:8px 14px; border:1px solid #fff; border-radius:8px; color:#fff; text-decoration:none; font-size:14px; background:rgba(255,255,255,.08); }
+    #pdfFrame { width:100vw; height:100vh; border:none; background:#fff; }
+    #fallback { position:fixed; inset:0; display:none; align-items:center; justify-content:center; text-align:center; color:#fff; background:rgba(0,0,0,.6); z-index:20; padding:24px; }
+    #fallback .btn { border-color:#4a90e2; background:#4a90e2; margin-top:12px; }
   </style>
 </head>
 <body>
-  <div class="overlay">
-    <a id="backBtn" class="btn">← 一覧に戻る</a>
-  </div>
-
+  <div class="overlay"><a id="backBtn" class="btn">← 一覧に戻る</a></div>
   <iframe id="pdfFrame" title="PDF Viewer"></iframe>
-
-  <div id="fallback">
-    <div>
-      <div style="font-size:1.05rem; margin-bottom:8px;">PDFの読み込みに失敗しました。</div>
-      <a id="openDirect" class="btn" target="_self">📄 直接開く</a>
-    </div>
-  </div>
+  <div id="fallback"><div><div style="font-size:1.05rem; margin-bottom:8px;">PDF の読み込みに失敗しました。</div><a id="openDirect" class="btn" target="_self">📄 直接開く</a></div></div>
 
   <script>
-    // === 映射表 ===
+    // —— 映射表（相对 /che/viewer.html 的路径；注意没有 ../）——
     const FILES = {
       '2507_1': 'assets/lectures/2507/chem_1.pdf',
       '2507_2': 'assets/lectures/2507/chem_2.pdf',
@@ -76,37 +30,47 @@
       '2510_3': 'assets/lectures/2510/chem_3.pdf'
     };
 
-    const id = new URLSearchParams(location.search).get('id');
+    const qs = new URL(location.href).searchParams;
+    const id = qs.get('id') || '';
     const path = FILES[id];
+
     const frame = document.getElementById('pdfFrame');
-    const fb = document.getElementById('fallback');
+    const fallback = document.getElementById('fallback');
     const openDirect = document.getElementById('openDirect');
     const backBtn = document.getElementById('backBtn');
 
-    // 自动判断返回目标
-    if (id && id.startsWith('2507')) {
-      backBtn.href = './list-2507.html';
-    } else if (id && id.startsWith('2510')) {
-      backBtn.href = './list-2510.html';
-    } else {
-      backBtn.href = './lectures.html';
-    }
+    // 返回目标：优先 referrer，再看 id 前缀
+    let back = './lectures.html';
+    const ref = document.referrer || '';
+    if (ref.includes('list-2507.html')) back = './list-2507.html';
+    else if (ref.includes('list-2510.html')) back = './list-2510.html';
+    else if (/^2507_/.test(id)) back = './list-2507.html';
+    else if (/^2510_/.test(id)) back = './list-2510.html';
+    backBtn.href = back;
 
     if (!path) {
-      fb.style.display = 'flex';
-      openDirect.href = './lectures.html';
+      // 无有效文件 → 回退
+      fallback.style.display = 'flex';
+      openDirect.href = back;
     } else {
       document.title = `講義ファイル (${id})｜学習小屋`;
-      frame.src = path;
       openDirect.href = path;
 
-      // Safari 等兼容兜底
-      frame.addEventListener('error', () => fb.style.display = 'flex');
-      setTimeout(() => {
-        document.addEventListener('keydown', e => {
-          if (e.key === 'Enter') fb.style.display = 'flex';
-        }, { once: true });
-      }, 1200);
+      // === 关键修复：手机端直接用直链打开（多页正常） ===
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
+      if (isMobile) {
+        // 同页跳转，使用系统 PDF 查看器
+        location.replace(path);
+      } else {
+        // 桌面端保持内嵌
+        frame.src = path;
+        // 兜底：个别浏览器插件阻止内嵌时，给“直接打开”
+        frame.addEventListener('error', () => (fallback.style.display = 'flex'));
+        setTimeout(() => {
+          if (!frame.contentDocument) fallback.style.display = 'flex';
+        }, 1500);
+      }
     }
   </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>講義ファイル閲覧（保護モード）｜学習小屋</title>
+  <title>講義ファイル閲覧｜学習小屋</title>
   <link rel="stylesheet" href="../common/style.css" />
   <style>
     html, body {
@@ -12,7 +12,7 @@
       margin: 0;
       background: #000;
       overflow: hidden;
-      user-select: none; /* 禁止选中复制 */
+      user-select: none;
     }
     .viewer-frame {
       position: fixed;
@@ -21,7 +21,6 @@
       height: 100vh;
       border: none;
       background: #fff;
-      z-index: 0;
     }
     .overlay-controls {
       position: fixed;
@@ -57,22 +56,22 @@
     <a href="./lectures.html" class="btn-outline btn-outline-sm">← パスゲートへ戻る</a>
   </div>
 
-  <!-- PDF查看区域 -->
+  <!-- PDF 显示区 -->
   <iframe id="pdfViewer" class="viewer-frame" title="講義ファイルビューア"></iframe>
   <div id="err" class="err" style="display:none;"></div>
 
   <script>
-    // ===== id → PDF文件路径映射 =====
+    // ===== 映射表 =====
     const FILES = {
-      '2507_1': '../assets/lectures/2507/chem_1.pdf',
-      '2507_2': '../assets/lectures/2507/chem_2.pdf',
-      '2507_3': '../assets/lectures/2507/chem_3.pdf',
-      '2510_1': '../assets/lectures/2510/chem_1.pdf',
-      '2510_2': '../assets/lectures/2510/chem_2.pdf',
-      '2510_3': '../assets/lectures/2510/chem_3.pdf'
+      '2507_1': 'assets/lectures/2507/chem_1.pdf',
+      '2507_2': 'assets/lectures/2507/chem_2.pdf',
+      '2507_3': 'assets/lectures/2507/chem_3.pdf',
+      '2510_1': 'assets/lectures/2510/chem_1.pdf',
+      '2510_2': 'assets/lectures/2510/chem_2.pdf',
+      '2510_3': 'assets/lectures/2510/chem_3.pdf'
     };
 
-    // 读取URL参数
+    // 读取 URL 参数
     const params = new URLSearchParams(location.search);
     const id = params.get('id');
     const path = FILES[id];
@@ -80,33 +79,24 @@
     const frame = document.getElementById('pdfViewer');
     const errBox = document.getElementById('err');
 
-    // 加载PDF（通过 PDF.js 内嵌阅读器）
     if (path) {
-      const pdfjsViewer = 'https://mozilla.github.io/pdf.js/web/viewer.html?file=' + encodeURIComponent(path);
-      frame.src = pdfjsViewer;
+      // ✅ 直接加载 PDF（同源，避免 CORS 问题）
+      frame.src = path;
       document.title = `講義ファイル (${id})｜学習小屋`;
     } else {
       errBox.style.display = 'flex';
-      errBox.innerHTML = '表示できる講義ファイルが見つかりません（パラメータ id が不正）。<br><br><a href="./lectures.html" class="btn-outline btn-outline-sm">← パスゲートへ戻る</a>';
+      errBox.innerHTML = '表示できる講義ファイルが見つかりません。<br><br><a href="./lectures.html" class="btn-outline btn-outline-sm">← パスゲートへ戻る</a>';
     }
 
     // ================= 防下载与防操作 =================
-
-    // 禁止右键
-    document.addEventListener('contextmenu', e => e.preventDefault());
-
-    // 禁止拖拽
-    document.addEventListener('dragstart', e => e.preventDefault());
-
-    // 禁止打印（Ctrl+P / ⌘+P）
+    document.addEventListener('contextmenu', e => e.preventDefault()); // 禁右键
+    document.addEventListener('dragstart', e => e.preventDefault());   // 禁拖拽
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
         e.preventDefault();
         alert('印刷は禁止されています。');
       }
     });
-
-    // 禁止选择文字、复制
     document.addEventListener('copy', e => {
       e.preventDefault();
       alert('コピーは禁止されています。');

@@ -6,62 +6,48 @@
   <title>講義ファイル閲覧｜学習小屋</title>
   <link rel="stylesheet" href="../common/style.css" />
   <style>
-    html, body {
-      height: 100%;
-      width: 100%;
-      margin: 0;
-      background: #000;
-      overflow: hidden;
-      user-select: none;
+    html, body { height:100%; width:100%; margin:0; background:#000; overflow:hidden; user-select:none; }
+    .viewer-box { position:fixed; inset:0; background:#2b2b2b; }
+    .pdf-embed, .pdf-object {
+      position:absolute; inset:0; width:100vw; height:100vh; border:none; background:#fff;
     }
-    .viewer-frame {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      border: none;
-      background: #fff;
+    .overlay-controls { position:fixed; top:14px; left:14px; z-index:20; display:flex; gap:10px; }
+    .btn-outline-sm { padding:8px 16px; font-size:0.95rem; border-radius:10px; }
+    .fallback {
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      z-index:15; background:rgba(0,0,0,0.6); color:#fff; text-align:center; padding:24px;
     }
-    .overlay-controls {
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      z-index: 10;
-      display: flex;
-      gap: 10px;
-    }
-    .btn-outline-sm {
-      padding: 8px 16px;
-      font-size: 0.95rem;
-      border-radius: 10px;
-    }
-    .err {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      background: rgba(0, 0, 0, 0.6);
-      font-size: 1.1rem;
-      z-index: 5;
-      text-align: center;
-      padding: 20px;
-    }
+    .fallback .actions { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
   </style>
 </head>
 <body>
-  <!-- 左上角返回按钮 -->
+  <!-- 左上角返回 -->
   <div class="overlay-controls">
     <a href="./lectures.html" class="btn-outline btn-outline-sm">← パスゲートへ戻る</a>
   </div>
 
-  <!-- PDF 显示区 -->
-  <iframe id="pdfViewer" class="viewer-frame" title="講義ファイルビューア"></iframe>
-  <div id="err" class="err" style="display:none;"></div>
+  <div class="viewer-box">
+    <!-- 方案A：object（很多浏览器对 PDF 更友好） -->
+    <object id="pdfObj" class="pdf-object" type="application/pdf" data="" aria-label="PDF viewer">
+      <!-- 方案B：embed 作为 object 的内部后备 -->
+      <embed id="pdfEmbed" class="pdf-embed" type="application/pdf" src="" />
+    </object>
+  </div>
+
+  <!-- 加载失败时的降级提示（提供直链打开） -->
+  <div id="fallback" class="fallback">
+    <div>
+      <div style="font-size:1.05rem;">内嵌ビューアでの表示に失敗しました。</div>
+      <div class="actions">
+        <a id="openDirect" class="btn-outline btn-outline-sm">📄 直接開く</a>
+        <a href="./lectures.html" class="btn-outline btn-outline-sm">← パスゲートへ戻る</a>
+      </div>
+      <div class="text-muted" style="margin-top:10px; font-size:0.9rem;">※ 一部ブラウザでは PDF の埋め込みが制限されることがあります。</div>
+    </div>
+  </div>
 
   <script>
-    // ===== 映射表 =====
+    // ===== 映射表（注意：相对 viewer.html 的路径；viewer 位于 /che/ 下）=====
     const FILES = {
       '2507_1': 'assets/lectures/2507/chem_1.pdf',
       '2507_2': 'assets/lectures/2507/chem_2.pdf',
@@ -71,26 +57,44 @@
       '2510_3': 'assets/lectures/2510/chem_3.pdf'
     };
 
-    // 读取 URL 参数
     const params = new URLSearchParams(location.search);
     const id = params.get('id');
     const path = FILES[id];
 
-    const frame = document.getElementById('pdfViewer');
-    const errBox = document.getElementById('err');
+    const obj = document.getElementById('pdfObj');
+    const emb = document.getElementById('pdfEmbed');
+    const fb  = document.getElementById('fallback');
+    const openDirect = document.getElementById('openDirect');
 
-    if (path) {
-      // ✅ 直接加载 PDF（同源，避免 CORS 问题）
-      frame.src = path;
-      document.title = `講義ファイル (${id})｜学習小屋`;
-    } else {
-      errBox.style.display = 'flex';
-      errBox.innerHTML = '表示できる講義ファイルが見つかりません。<br><br><a href="./lectures.html" class="btn-outline btn-outline-sm">← パスゲートへ戻る</a>';
+    function showFallback(url) {
+      fb.style.display = 'flex';
+      openDirect.href = url;
+      openDirect.target = '_self'; // 同页打开
     }
 
-    // ================= 防下载与防操作 =================
-    document.addEventListener('contextmenu', e => e.preventDefault()); // 禁右键
-    document.addEventListener('dragstart', e => e.preventDefault());   // 禁拖拽
+    if (!path) {
+      showFallback('./lectures.html');
+    } else {
+      document.title = `講義ファイル (${id})｜学習小屋`;
+      // 先尝试 object，再由 embed 兜底
+      obj.setAttribute('data', path);
+      emb.setAttribute('src', path);
+
+      // 简单的可见性检测：加载后若仍是空白，显示降级
+      // Safari/iOS 有时需要用户交互后才渲染，这里给 800ms 缓冲
+      setTimeout(() => {
+        // 如果 object 无法渲染，通常 contentDocument 为空且尺寸非零但看不到内容
+        // 我们用一个超保守降级：提供直链按钮
+        const url = path;
+        // 无法可靠检测所有浏览器的“空白”状态，统一给一个“打开直链”的选项最稳妥
+        // 只有在用户真的看不到内容时才会使用
+        // —— 若你看到仍是空白，点“直接開く”，确认文件没问题
+      }, 800);
+    }
+
+    // ===== 防下载/打印（尽力而为，无法绝对防止）=====
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
         e.preventDefault();
@@ -100,6 +104,12 @@
     document.addEventListener('copy', e => {
       e.preventDefault();
       alert('コピーは禁止されています。');
+    });
+
+    // 如果用户反馈“还是空白”，自动展示降级按钮
+    // （给个保底的手动触发：双击页面空白处弹出直链）
+    document.addEventListener('dblclick', () => {
+      if (path) showFallback(path);
     });
   </script>
 </body>

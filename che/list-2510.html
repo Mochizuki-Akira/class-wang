@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>2510JC 講義リスト｜学習小屋</title>
+  <title>2510基础班 講義リスト｜学習小屋</title>
   <link rel="stylesheet" href="../common/style.css">
 
   <style>
-    /* ====== 折叠组件：让 summary 看起来就是“带边框按钮” ====== */
+    /* ====== 折叠组件样式：summary 看起来像按钮 ====== */
     details.fold { border: none; padding: 0; background: transparent; }
     details.fold + details.fold { margin-top: var(--space-4); }
 
-    /* 标题（summary）按钮外观 */
     details.fold > summary {
       list-style: none;
       display: block;
@@ -31,14 +30,11 @@
     }
     details.fold > summary:active { transform: translateY(1px); }
     details.fold > summary::-webkit-details-marker { display: none; }
-
-    /* 展开时标题与下面面板连体 */
     details.fold[open] > summary {
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
     }
 
-    /* 面板主体 */
     .fold-body {
       border: 2px solid var(--color-primary);
       border-top: none;
@@ -49,15 +45,13 @@
     }
     details.fold:not([open]) > .fold-body { display: none; }
 
-    /* 小箭头 */
     .chev { display:inline-block; margin-right: 6px; transition: transform .2s ease; }
     details.fold[open] .chev { transform: rotate(90deg); }
 
-    /* 按钮列表 */
     .btn-list { display:flex; flex-direction:column; gap:12px; }
-    .btn-outline.btn--lg, .btn-outline.btn-outline-large { display:block; text-align:center; width:100%; }
+    .btn-outline.btn--lg { display:block; text-align:center; width:100%; }
 
-    /* 内层（二层）折叠：稍小一点 */
+    /* 二层折叠 */
     details.fold.sub > summary { font-size: 1rem; padding: 10px 14px; }
     details.fold.sub .fold-body { padding: 10px 14px 14px; }
 
@@ -85,10 +79,7 @@
         <summary><span class="chev">▶</span> 一、講義ファイル</summary>
         <div class="fold-body">
           <div class="btn-list">
-            <!-- 第1回 -->
             <a href="viewer.html?id=2510_1" class="btn-outline btn--lg">第1回：原子構造と周期表</a>
-
-            <!-- 第2回：包含两个文件 → 内层折叠 -->
             <details class="fold sub">
               <summary><span class="chev">▶</span> 第2回：化学結合（2ファイル）</summary>
               <div class="fold-body">
@@ -98,18 +89,24 @@
                 </div>
               </div>
             </details>
+            <a href="viewer.html?id=2510_4" class="btn-outline btn--lg">第3回：物質量・化学反応式</a>
+            <a href="viewer.html?id=2510_5" class="btn-outline btn--lg">第4回：錯題講解・復習</a>
+            <a href="viewer.html?id=2510_6" class="btn-outline btn--lg">第5回：気体の状態・理想気体</a>
+            <a href="viewer.html?id=2510_7" class="btn-outline btn--lg">第6回：溶液・濃度・膠体</a>
+            <a href="viewer.html?id=2510_8" class="btn-outline btn--lg">第7回：演習・復習</a>
+            <a href="viewer.html?id=2510_9" class="btn-outline btn--lg">第8回：熱化学</a>
+            <a href="viewer.html?id=2510_10" class="btn-outline btn--lg">第9回：反応速度・平衡・酸塩基</a>
+            <a href="viewer.html?id=2510_10" class="btn-outline btn--lg">第10回：酸・塩基、pH、滴定</a>
           </div>
         </div>
       </details>
 
-      <!-- 二、宿題ファイル（示例占位） -->
+      <!-- 二、宿題ファイル -->
       <details class="fold">
         <summary><span class="chev">▶</span> 二、宿題ファイル</summary>
         <div class="fold-body">
           <div class="btn-list">
             <a href="viewer.html?id=2510_hw1" class="btn-outline">第1回 宿題</a>
-
-            <!-- 若第2回有两个作业文件，可用此内层折叠 -->
             <details class="fold sub">
               <summary><span class="chev">▶</span> 第2回 宿題（2ファイル）</summary>
               <div class="fold-body">
@@ -119,11 +116,19 @@
                 </div>
               </div>
             </details>
+            <a href="viewer.html?id=2510_hw3" class="btn-outline">第3回 宿題</a>
+            <a href="viewer.html?id=2510_hw4" class="btn-outline">第4回 宿題</a>
+            <a href="viewer.html?id=2510_hw5" class="btn-outline">第5回 宿題</a>
+            <a href="viewer.html?id=2510_hw6" class="btn-outline">第6回 宿題</a>
+            <a href="viewer.html?id=2510_hw7" class="btn-outline">第7回 宿題</a>
+            <a href="viewer.html?id=2510_hw8" class="btn-outline">第8回 宿題</a>
+            <a href="viewer.html?id=2510_hw9" class="btn-outline">第9回 宿題</a>
+            <a href="viewer.html?id=2510_hw10" class="btn-outline">第10回 宿題</a>
           </div>
         </div>
       </details>
 
-      <!-- 三、コース概要（時間割・内容） -->
+      <!-- 三、コース概要 -->
       <details class="fold">
         <summary><span class="chev">▶</span> 三、コース概要（時間割・内容）</summary>
         <div class="fold-body">
@@ -137,16 +142,16 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td class="date">2025.10.16</td><td class="hide-sm">第1回</td><td class="hide-sm">14:30〜17:30</td><td>物質的構成：原子構造、電子配置、離子、元素の周期律</td></tr>
-              <tr><td class="date">2025.10.23</td><td class="hide-sm">第2回</td><td class="hide-sm">14:30〜17:30</td><td>物質的構成：離子結合、金属結合、結晶格子、共有結合</td></tr>
-              <tr><td class="date">2025.10.30</td><td class="hide-sm">第3回</td><td class="hide-sm">14:30〜17:30</td><td>物質的構成：分子の性質、物質量、原子量、分子量、式量、化学反応式、配平</td></tr>
-              <tr><td class="date">2025.11.13</td><td class="hide-sm">第4回</td><td class="hide-sm">14:30〜17:30</td><td>物質的構成：復習、錯題講解、演習</td></tr>
-              <tr><td class="date">2025.11.20</td><td class="hide-sm">第5回</td><td class="hide-sm">14:30〜17:30</td><td>物質の状態：三態、気体状態方程式、気液平衡（飽和蒸気圧）、混合気体、理想気体</td></tr>
-              <tr><td class="date">2025.11.27</td><td class="hide-sm">第6回</td><td class="hide-sm">14:30〜17:30</td><td>物質の状態：溶解度、溶液濃度、稀薄溶液の性質、膠体</td></tr>
-              <tr><td class="date">2025.12.04</td><td class="hide-sm">第7回</td><td class="hide-sm">14:30〜17:30</td><td>物質の状態：復習、錯題講解、演習</td></tr>
-              <tr><td class="date">2025.12.11</td><td class="hide-sm">第8回</td><td class="hide-sm">14:30〜17:30</td><td>物質の反応：熱化学</td></tr>
-              <tr><td class="date">2025.12.18</td><td class="hide-sm">第9回</td><td class="hide-sm">14:30〜17:30</td><td>物質の反応：反応速度、反応平衡、勒沙特列原理</td></tr>
-              <tr><td class="date">2025.12.25</td><td class="hide-sm">第10回</td><td class="hide-sm">14:30〜17:30</td><td>物質の反応：酸・塩基、pH、酸鹼滴定、塩・中和滴定</td></tr>
+              <tr><td class="date">2025.10.15</td><td class="hide-sm">第1回</td><td class="hide-sm">14:30〜17:30</td><td>原子構造、電子配置、元素の周期律</td></tr>
+              <tr><td class="date">2025.10.23</td><td class="hide-sm">第2回</td><td class="hide-sm">14:30〜17:30</td><td>化学結合、結晶格子、共有結合</td></tr>
+              <tr><td class="date">2025.10.30</td><td class="hide-sm">第3回</td><td class="hide-sm">14:30〜17:30</td><td>物質量、式量、化学反応式、配平</td></tr>
+              <tr><td class="date">2025.11.13</td><td class="hide-sm">第4回</td><td class="hide-sm">14:30〜17:30</td><td>錯題講解、演習</td></tr>
+              <tr><td class="date">2025.11.20</td><td class="hide-sm">第5回</td><td class="hide-sm">14:30〜17:30</td><td>気体の状態、理想気体、混合気体</td></tr>
+              <tr><td class="date">2025.11.27</td><td class="hide-sm">第6回</td><td class="hide-sm">14:30〜17:30</td><td>溶解度、溶液濃度、膠体</td></tr>
+              <tr><td class="date">2025.12.04</td><td class="hide-sm">第7回</td><td class="hide-sm">14:30〜17:30</td><td>復習、演習</td></tr>
+              <tr><td class="date">2025.12.11</td><td class="hide-sm">第8回</td><td class="hide-sm">14:30〜17:30</td><td>熱化学</td></tr>
+              <tr><td class="date">2025.12.18</td><td class="hide-sm">第9回</td><td class="hide-sm">14:30〜17:30</td><td>反応速度、平衡、勒沙特列原理</td></tr>
+              <tr><td class="date">2025.12.25</td><td class="hide-sm">第10回</td><td class="hide-sm">14:30〜17:30</td><td>酸・塩基、pH、滴定</td></tr>
             </tbody>
           </table>
         </div>

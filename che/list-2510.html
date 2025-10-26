@@ -5,23 +5,125 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>2510JC 講義リスト｜学習小屋</title>
   <link rel="stylesheet" href="../common/style.css">
+
+  <style>
+    /* 折叠（details/summary）外观微调，保持与你站点风格一致 */
+    details { border: 1px solid var(--color-border); border-radius: 12px; background:#fff; }
+    details + details { margin-top: var(--space-4); }
+    summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--color-primary-700);
+      display: flex; align-items: center; gap: 10px;
+    }
+    summary::-webkit-details-marker { display: none; }
+    .chev { transition: transform .2s ease; }
+    details[open] .chev { transform: rotate(90deg); }
+
+    .btn-list { display:flex; flex-direction:column; gap:12px; padding: 0 16px 16px 16px; }
+    .btn-outline.btn--lg, .btn-outline.btn-outline-large { display:block; text-align:center; }
+
+    /* 二层折叠（第2回） */
+    .sub > summary { font-size: 1rem; padding: 10px 16px; color: var(--color-primary); }
+    .sub { margin: 0 12px 12px 12px; border-radius: 10px; }
+
+    /* 课程表 */
+    .syllabus {
+      width: 100%; border-collapse: collapse; font-size: var(--fs-sm);
+    }
+    .syllabus th, .syllabus td {
+      border: 1px solid var(--color-border);
+      padding: 10px 12px; text-align: left; background:#fff;
+    }
+    .syllabus thead th { background: #e6f0ff; color:#2e69a0; font-weight:700; }
+    .syllabus .date { white-space: nowrap; }
+    @media (max-width: 640px) {
+      .syllabus { font-size: 0.85rem; }
+      .syllabus .hide-sm { display:none; }
+    }
+  </style>
 </head>
 <body>
   <div id="site-header"></div>
 
   <main class="site-main">
-    <section class="card">
-      <h2>2510JC クラス講義ファイル</h2>
-      <p class="text-muted">以下の講義資料を閲覧できます。</p>
+    <section class="card" style="max-width: var(--max-w-content); text-align:left;">
+      <h2 class="text-center">2510JC クラス講義ファイル</h2>
+      <p class="text-muted text-center">以下の資料はクラス専用です。リンクをクリックするとページ内で表示されます（モバイルは直開）。</p>
 
-      <div class="mt-6" style="display:flex; flex-direction:column; gap:16px;">
-        <a href="viewer.html?id=2510_1" class="btn-outline btn--lg">第1回：原子構造と周期表</a>
-        <a href="viewer.html?id=2510_2" class="btn-outline btn--lg">第2回(1)：化学結合</a>
-        <a href="viewer.html?id=2510_3" class="btn-outline btn--lg">第2回(2)：結晶格子</a>
-      </div>
+      <!-- 一、讲义文件 -->
+      <details open>
+        <summary><span class="chev">▶</span> 一、講義ファイル</summary>
+        <div class="btn-list">
+          <!-- 第1回 -->
+          <a href="viewer.html?id=2510_1" class="btn-outline btn--lg">第1回：原子構造と周期表</a>
 
-      <div class="notice">
-        ← <a href="./lectures.html">パス入力ページに戻る</a>
+          <!-- 第2回：包含两个文件 → 二层折叠 -->
+          <details class="sub">
+            <summary><span class="chev">▶</span> 第2回：化学結合（2ファイル）</summary>
+            <div class="btn-list" style="padding-top:8px;">
+              <a href="viewer.html?id=2510_2" class="btn-outline">第2回(1)：化学結合</a>
+              <a href="viewer.html?id=2510_3" class="btn-outline">第2回(2)：結晶格子</a>
+            </div>
+          </details>
+        </div>
+      </details>
+
+      <!-- 二、作业文件（示例：你上传后在 viewer 的 FILES 里补映射即可） -->
+      <details>
+        <summary><span class="chev">▶</span> 二、宿題ファイル</summary>
+        <div class="btn-list">
+          <!-- 这里的 id 只是示例。你上传后，在 viewer.html 的 FILES 里添加：
+               '2510_hw1': 'assets/homework/2510/hw_1.pdf'  等映射即可 -->
+          <a href="viewer.html?id=2510_hw1" class="btn-outline">第1回 宿題</a>
+          <a href="viewer.html?id=2510_hw2" class="btn-outline">第2回 宿題（2ファイルのときは下を使う）</a>
+
+          <!-- 二层折叠示例（若某次作业也有两个文件） -->
+          <details class="sub">
+            <summary><span class="chev">▶</span> 第2回 宿題（2ファイル）</summary>
+            <div class="btn-list" style="padding-top:8px;">
+              <a href="viewer.html?id=2510_hw2a" class="btn-outline">第2回 宿題 A</a>
+              <a href="viewer.html?id=2510_hw2b" class="btn-outline">第2回 宿題 B</a>
+            </div>
+          </details>
+        </div>
+      </details>
+
+      <!-- 三、课程大纲（根据你提供图片内容整理） -->
+      <details>
+        <summary><span class="chev">▶</span> 三、コース概要（時間割・内容）</summary>
+        <div style="padding: 0 16px 16px 16px;">
+          <table class="syllabus">
+            <thead>
+              <tr>
+                <th class="date">日期</th>
+                <th class="hide-sm">回数</th>
+                <th class="hide-sm">上課時間</th>
+                <th>課程內容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="date">2025.10.16</td><td class="hide-sm">第1回</td><td class="hide-sm">14:30〜17:30</td><td>物質的構成：原子構造、電子配置、離子、元素の周期律</td></tr>
+              <tr><td class="date">2025.10.23</td><td class="hide-sm">第2回</td><td class="hide-sm">14:30〜17:30</td><td>物質的構成：離子結合、金属結合、結晶格子、共有結合</td></tr>
+              <tr><td class="date">2025.10.30</td><td class="hide-sm">第3回</td><td class="hide-sm">14:30〜17:30</td><td>物質的構成：分子の性質、物質量、原子量、分子量、式量、化学反応式、配平</td></tr>
+              <tr><td class="date">2025.11.13</td><td class="hide-sm">第4回</td><td class="hide-sm">14:30〜17:30</td><td>物質的構成：復習、錯題講解、演習</td></tr>
+              <tr><td class="date">2025.11.20</td><td class="hide-sm">第5回</td><td class="hide-sm">14:30〜17:30</td><td>物質の状態：三態、気体状態方程式、気液平衡（飽和蒸気圧）、混合気体、理想気体</td></tr>
+              <tr><td class="date">2025.11.27</td><td class="hide-sm">第6回</td><td class="hide-sm">14:30〜17:30</td><td>物質の状態：溶解度、溶液濃度、稀薄溶液の性質、膠体</td></tr>
+              <tr><td class="date">2025.12.04</td><td class="hide-sm">第7回</td><td class="hide-sm">14:30〜17:30</td><td>物質の状態：復習、錯題講解、演習</td></tr>
+              <tr><td class="date">2025.12.11</td><td class="hide-sm">第8回</td><td class="hide-sm">14:30〜17:30</td><td>物質の反応：熱化学</td></tr>
+              <tr><td class="date">2025.12.18</td><td class="hide-sm">第9回</td><td class="hide-sm">14:30〜17:30</td><td>物質の反応：反応速度、反応平衡、勒沙特列原理</td></tr>
+              <tr><td class="date">2025.12.25</td><td class="hide-sm">第10回</td><td class="hide-sm">14:30〜17:30</td><td>物質の反応：酸・塩基、pH、酸鹼滴定、塩・中和滴定</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <div class="notice" style="margin-top:24px;">
+        ご不明点は Wechat: oushidou040129 まで。<br>
+        ※ 宿題ファイルのリンクはプレースホルダーです。アップロード後、<code>viewer.html</code> の <code>FILES</code> に <code>2510_hw*</code> のマッピングを追加してください。
       </div>
     </section>
   </main>

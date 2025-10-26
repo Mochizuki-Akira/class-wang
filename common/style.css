@@ -189,3 +189,66 @@ a { color: inherit; text-decoration: none; }
 .text-center { text-align: center; }
 .text-muted  { color: var(--color-muted); }
 .mt-5 { margin-top: var(--space-5); }
+
+/* ===========================================================
+   Enhanced Buttons (v2) - clearer, larger, more modern
+   =========================================================== */
+
+/* 共通 */
+.btn {
+  display: inline-block;
+  padding: 14px 30px;
+  border-radius: 10px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+  user-select: none;
+  text-decoration: none;
+  letter-spacing: 0.4px;
+}
+
+/* 蓝色主按钮 */
+.btn-primary {
+  background: linear-gradient(135deg, #4a90e2 0%, #357ab8 100%);
+  color: #fff;
+  font-size: 1.2rem;
+  box-shadow: 0 5px 14px rgba(74,144,226,0.25);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5aa2f0 0%, #3b7ed0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(74,144,226,0.35);
+}
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(74,144,226,0.3);
+}
+
+/* 次级按钮（浅灰） */
+.btn-secondary {
+  background: #fff;
+  border: 2px solid #4a90e2;
+  color: #4a90e2;
+  font-size: 1rem;
+}
+.btn-secondary:hover {
+  background: #e6f0ff;
+  color: #357ab8;
+}
+
+/* 小型（如讲义下载页可用） */
+.btn-small {
+  padding: 8px 18px;
+  font-size: 0.9rem;
+}
+
+/* 大型（用于主按钮或首页主入口） */
+.btn-large {
+  padding: 18px 40px;
+  font-size: 1.4rem;
+  border-radius: 12px;
+}

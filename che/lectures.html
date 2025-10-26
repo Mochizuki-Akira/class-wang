@@ -3,122 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>学生用講義ファイル（読み込み）｜学習小屋</title>
+  <title>講義ファイル閲覧｜学習小屋</title>
   <link rel="stylesheet" href="../common/style.css" />
   <style>
-    .file-list { text-align:left; margin-top: var(--space-5); }
-    .file-item { padding: 10px 12px; border:1px solid var(--color-border); border-radius:8px; margin-bottom:10px; }
-    .viewer { margin-top: var(--space-6); width:100%; height:70vh; border:1px solid var(--color-border); border-radius:10px; overflow:hidden; }
-    .hint { font-size: var(--fs-sm); color: var(--color-muted); }
+    .viewer-container {
+      margin-top: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .viewer-frame {
+      width: 100%;
+      max-width: 1100px;   /* 电脑端显示宽度 */
+      height: 90vh;        /* 显示区域高度 */
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .file-info {
+      margin-top: var(--space-5);
+      font-size: var(--fs-sm);
+      color: var(--color-muted);
+      text-align: center;
+    }
+
+    @media (max-width: 800px) {
+      .viewer-frame {
+        height: 75vh;
+        max-width: 95%;
+      }
+    }
   </style>
 </head>
 <body>
   <div id="site-header"></div>
 
   <main class="site-main">
-    <section class="card max-w-content">
-      <h2>学生用講義ファイル（読み込み）</h2>
-      <p class="text-muted">PDFはブラウザ内で直接プレビューできます。その他（PPTX/DOCX等）は一覧表示のみ（ダウンロードしてご覧ください）。</p>
+    <section class="card max-w-content text-center">
+      <h2>学生用講義ファイル</h2>
+      <p class="text-muted">最新版の講義資料をオンラインで閲覧できます。</p>
 
-      <div class="alert alert--info">
-        端末から講義ファイルを選択してください（アップロードはされません。ブラウザ内で一時表示します）。
+      <div class="viewer-container">
+        <iframe id="pdfViewer" class="viewer-frame" title="講義ファイルビューア"></iframe>
+        <div class="file-info" id="fileInfo"></div>
       </div>
 
-      <div class="mt-5">
-        <input id="fileInput" type="file" multiple
-               accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg"
-               style="padding:10px; border:1px solid var(--color-border); border-radius:8px;">
-        <button class="button button--primary" id="clearBtn" style="margin-left:8px;">クリア</button>
+      <div class="alert alert--info mt-6">
+        ※ 資料は学習目的にのみご利用ください。ダウンロードや再配布は禁止されています。
       </div>
-
-      <div class="file-list" id="fileList"></div>
-
-      <div class="viewer" id="viewer" style="display:none;">
-        <iframe id="pdfFrame" title="PDF Viewer" style="border:0; width:100%; height:100%;"></iframe>
-      </div>
-
-      <p class="hint mt-5">※ 本機能は学習用の簡易ビューアです。機密資料の取り扱いにはご注意ください。</p>
     </section>
   </main>
 
   <div id="site-footer"></div>
 
   <script>
+    // ======== ここを変更すれば講義ファイルを差し替え可能 ========
+    const PDF_PATH = "../che/lectures/chem_lecture1.pdf";  // ← ここを自分のファイルパスに変更
+    // ===============================================================
+
     (async () => {
       const hdr = await fetch('../common/header.html').then(r=>r.text()).catch(()=> '');
       const ftr = await fetch('../common/footer.html').then(r=>r.text()).catch(()=> '');
       document.getElementById('site-header').innerHTML = hdr;
       document.getElementById('site-footer').innerHTML = ftr;
+
+      // PDFを読み込み
+      const viewer = document.getElementById('pdfViewer');
+      viewer.src = PDF_PATH;
+      document.getElementById('fileInfo').textContent = `現在表示中の資料： ${PDF_PATH.split('/').pop()}`;
     })();
-
-    const fileInput = document.getElementById('fileInput');
-    const fileList  = document.getElementById('fileList');
-    const viewer    = document.getElementById('viewer');
-    const pdfFrame  = document.getElementById('pdfFrame');
-    const clearBtn  = document.getElementById('clearBtn');
-
-    function formatSize(bytes) {
-      if (bytes < 1024) return bytes + ' B';
-      if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
-      return (bytes/1024/1024).toFixed(1) + ' MB';
-    }
-
-    function isPDF(name) {
-      return /\.pdf$/i.test(name);
-    }
-
-    function openPDF(file) {
-      const url = URL.createObjectURL(file);
-      pdfFrame.src = url;
-      viewer.style.display = 'block';
-    }
-
-    function renderList(files) {
-      fileList.innerHTML = '';
-      Array.from(files).forEach((f, idx) => {
-        const div = document.createElement('div');
-        div.className = 'file-item';
-        const meta = document.createElement('div');
-        meta.textContent = `#${idx+1}  ${f.name}  (${formatSize(f.size)})`;
-        div.appendChild(meta);
-
-        if (isPDF(f.name)) {
-          const btn = document.createElement('button');
-          btn.className = 'button button--outline mt-3';
-          btn.textContent = 'PDFをプレビュー';
-          btn.onclick = () => openPDF(f);
-          div.appendChild(btn);
-        } else {
-          const note = document.createElement('div');
-          note.className = 'hint mt-3';
-          note.textContent = 'このファイル形式はブラウザ内プレビュー非対応です。ダウンロードしてご覧ください。';
-          div.appendChild(note);
-        }
-        fileList.appendChild(div);
-      });
-    }
-
-    fileInput.addEventListener('change', (e) => {
-      const files = e.target.files;
-      if (!files || files.length === 0) {
-        fileList.innerHTML = '';
-        viewer.style.display = 'none';
-        pdfFrame.src = '';
-        return;
-      }
-      renderList(files);
-      // 若只有一个PDF，自动打开
-      if (files.length === 1 && isPDF(files[0].name)) {
-        openPDF(files[0]);
-      }
-    });
-
-    clearBtn.addEventListener('click', () => {
-      fileInput.value = '';
-      fileList.innerHTML = '';
-      viewer.style.display = 'none';
-      pdfFrame.src = '';
-    });
   </script>
 </body>
 </html>

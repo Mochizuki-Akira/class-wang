@@ -1,6 +1,116 @@
-const FILES = {
-  '2507_1': '../assets/lectures/2507/chem_1.pdf',
-  '2507_2': '../assets/lectures/2507/chem_2.pdf',
-  '2510_1': '../assets/lectures/2510/chem_1.pdf',
-  '2510_2': '../assets/lectures/2510/chem_2.pdf'
-};
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>講義ファイル閲覧（保護モード）｜学習小屋</title>
+  <link rel="stylesheet" href="../common/style.css" />
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      background: #000;
+      overflow: hidden;
+      user-select: none; /* 禁止选中复制 */
+    }
+    .viewer-frame {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      background: #fff;
+      z-index: 0;
+    }
+    .overlay-controls {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 10;
+      display: flex;
+      gap: 10px;
+    }
+    .btn-outline-sm {
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      border-radius: 10px;
+    }
+    .err {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.6);
+      font-size: 1.1rem;
+      z-index: 5;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 左上角返回按钮 -->
+  <div class="overlay-controls">
+    <a href="./lectures.html" class="btn-outline btn-outline-sm">← パスゲートへ戻る</a>
+  </div>
+
+  <!-- PDF查看区域 -->
+  <iframe id="pdfViewer" class="viewer-frame" title="講義ファイルビューア"></iframe>
+  <div id="err" class="err" style="display:none;"></div>
+
+  <script>
+    // ===== id → PDF文件路径映射 =====
+    const FILES = {
+      '2507_1': '../assets/lectures/2507/chem_1.pdf',
+      '2507_2': '../assets/lectures/2507/chem_2.pdf',
+      '2507_3': '../assets/lectures/2507/chem_3.pdf',
+      '2510_1': '../assets/lectures/2510/chem_1.pdf',
+      '2510_2': '../assets/lectures/2510/chem_2.pdf',
+      '2510_3': '../assets/lectures/2510/chem_3.pdf'
+    };
+
+    // 读取URL参数
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+    const path = FILES[id];
+
+    const frame = document.getElementById('pdfViewer');
+    const errBox = document.getElementById('err');
+
+    // 加载PDF（通过 PDF.js 内嵌阅读器）
+    if (path) {
+      const pdfjsViewer = 'https://mozilla.github.io/pdf.js/web/viewer.html?file=' + encodeURIComponent(path);
+      frame.src = pdfjsViewer;
+      document.title = `講義ファイル (${id})｜学習小屋`;
+    } else {
+      errBox.style.display = 'flex';
+      errBox.innerHTML = '表示できる講義ファイルが見つかりません（パラメータ id が不正）。<br><br><a href="./lectures.html" class="btn-outline btn-outline-sm">← パスゲートへ戻る</a>';
+    }
+
+    // ================= 防下载与防操作 =================
+
+    // 禁止右键
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // 禁止拖拽
+    document.addEventListener('dragstart', e => e.preventDefault());
+
+    // 禁止打印（Ctrl+P / ⌘+P）
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        alert('印刷は禁止されています。');
+      }
+    });
+
+    // 禁止选择文字、复制
+    document.addEventListener('copy', e => {
+      e.preventDefault();
+      alert('コピーは禁止されています。');
+    });
+  </script>
+</body>
+</html>

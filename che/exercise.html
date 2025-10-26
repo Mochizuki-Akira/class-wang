@@ -1,1 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>化学練習問題 解答ページ｜学習小屋</title>
+  <link rel="stylesheet" href="../common/style.css" />
+</head>
+<body>
+  <!-- 共通ヘッダー -->
+  <div id="site-header"></div>
 
+  <main class="site-main">
+    <section class="card">
+      <h2>化学練習問題 解答用ページ</h2>
+
+      <ul style="list-style:none; padding:0; margin: var(--space-6) 0; text-align:left;">
+        <li><a href="q/quiz.html?chapter=ch1" class="link-button w-full">第1章　原子の構造と元素の周期表</a></li>
+        <li><a href="q/quiz.html?chapter=ch2" class="link-button w-full">第2章　状態の変化・固体・気体・溶液</a></li>
+        <li><a href="q/quiz.html?chapter=ch3" class="link-button w-full">第3章　化学反応と熱・光・平衡</a></li>
+        <li><a href="q/quiz.html?chapter=ch4" class="link-button w-full">第4章　酸と塩基</a></li>
+        <li><a href="q/quiz.html?chapter=ch5" class="link-button w-full">第5章　酸化還元</a></li>
+      </ul>
+
+      <div class="notice text-center">
+        ご不明な点があれば Wechat: oushidou040129 にご連絡ください。<br>
+        このページは作成中のため、不備があればご容赦ください。
+      </div>
+
+      <div class="alert alert--info mt-6 text-sm" style="text-align:left;">
+        🔒 管理用：パスワードを入力してください：
+        <div style="margin-top:8px;">
+          <input type="password" id="adminPass" placeholder="パスワード" style="padding:6px; font-size:14px; border:1px solid var(--color-border); border-radius:6px;">
+          <button class="button button--outline" onclick="checkAdmin()" style="margin-left:8px;">確認</button>
+        </div>
+        <div id="adminLink" style="display:none; margin-top:12px;">
+          <a href="q/decode.html" class="text-sm text-muted">▶ 管理人ページ：コード解読へ</a><br>
+          <a href="https://github.com/Mochizuki-Akira/class-wang/tree/main/che" class="text-sm text-muted">▶ 管理人ページ：ページ編集へ</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 共通フッター -->
+  <div id="site-footer"></div>
+
+  <script>
+    async function loadCommon() {
+      const hdr = await fetch('../common/header.html').then(r => r.text()).catch(() => '');
+      const ftr = await fetch('../common/footer.html').then(r => r.text()).catch(() => '');
+      document.getElementById('site-header').innerHTML = hdr;
+      document.getElementById('site-footer').innerHTML = ftr;
+    }
+    loadCommon();
+
+    function checkAdmin() {
+      const input = document.getElementById('adminPass').value.trim();
+      if (input === 'decode') {
+        document.getElementById('adminLink').style.display = 'block';
+      } else {
+        alert('パスワードが間違っています');
+      }
+    }
+  </script>
+</body>
+</html>

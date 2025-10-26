@@ -1,100 +1,41 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>化学解答ページ</title>
-    <style>
-        body {
-            font-family: "Hiragino Kaku Gothic ProN", sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
-            padding: 40px;
-            max-width: 800px;
-            margin: auto;
-        }
-
-        h1 {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        li {
-            margin: 15px 0;
-        }
-
-        a {
-            text-decoration: none;
-            color: #2980b9;
-            font-size: 18px;
-            transition: 0.2s ease;
-        }
-
-        a:hover {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-
-        p {
-            margin-top: 40px;
-            font-size: 14px;
-            color: #555;
-            border-top: 1px solid #ddd;
-            padding-top: 20px;
-        }
-
-        .admin {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #888;
-        }
-
-        .admin input {
-            padding: 4px;
-            font-size: 12px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>化学トップ｜学習小屋</title>
+  <link rel="stylesheet" href="../common/style.css" />
 </head>
 <body>
-    <h1>化学練習問題 解答用ページ</h1>
+  <div id="site-header"></div>
 
-    <ul>
-        <li><a href="q/quiz.html?chapter=ch1">第1章 原子の構造と元素の周期表</a></li>
-        <li><a href="q/quiz.html?chapter=ch2">第2章 状態の変化・固体・気体・溶液</a></li>
-        <li><a href="q/quiz.html?chapter=ch3">第3章 化学反応と熱・光・平衡</a></li>
-        <li><a href="q/quiz.html?chapter=ch4">第4章 酸と塩基</a></li>
-        <li><a href="q/quiz.html?chapter=ch5">第5章 酸化還元 </a></li>
-    </ul>
+  <main class="site-main">
+    <section class="card">
+      <h2>化学トップ</h2>
+      <p class="text-muted">無機・有機・理論化学などの教材・演習をまとめています。</p>
 
-    <p>
-        ご不明な点があれば、Wechat: oushidou040129 にご連絡ください。<br>
-        このページは作成中のため、不備があればご容赦ください。問題があればご連絡をお願いします。
-    </p>
+      <div class="nav mt-5">
+        <a href="./exercise.html">演習ページ（練習問題）</a>
+        <a href="./lectures.html">学生用講義ファイル（読み込み）</a>
+        <a href="./downloads.html">講義ダウンロード</a>
+      </div>
 
-    <div class="admin">
-        🔒 管理用：パスワードを入力してください：<br>
-        <input type="password" id="adminPass" placeholder="パスワード">
-        <button onclick="checkAdmin()">確認</button>
-        <div id="adminLink" style="display:none; margin-top:5px;">
-            <a href="q/decode.html" style="color:#555; font-size:12px;">▶ 管理人ページ：コード解読へ</a><br>
-            <a href="https://github.com/Mochizuki-Akira/class-wang/tree/main/che" style="color:#555; font-size:12px;">▶ 管理人ページ：ページ編集へ</a>
-        </div>
-    </div>
+      <div class="notice">
+        ご不明な点は Wechat: oushidou040129 まで。<br/>
+        ページは作成中のため、不備があればご容赦ください。
+      </div>
+    </section>
+  </main>
 
-    <script>
-      function checkAdmin() {
-        const input = document.getElementById('adminPass').value;
-        if (input === 'decode') {
-          document.getElementById('adminLink').style.display = 'block';
-        } else {
-          alert('パスワードが間違っています');
-        }
-      }
-    </script>
+  <div id="site-footer"></div>
+
+  <script>
+    (async () => {
+      const hdr = await fetch('../common/header.html').then(r=>r.text()).catch(()=> '');
+      const ftr = await fetch('../common/footer.html').then(r=>r.text()).catch(()=> '');
+      document.getElementById('site-header').innerHTML = hdr;
+      document.getElementById('site-footer').innerHTML = ftr;
+    })();
+  </script>
 </body>
 </html>

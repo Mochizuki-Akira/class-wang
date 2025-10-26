@@ -6,75 +6,62 @@
   <title>講義ファイル閲覧｜学習小屋</title>
   <link rel="stylesheet" href="../common/style.css" />
   <style>
-    .viewer-container {
-      margin-top: var(--space-6);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    /* 让页面本身占满视口，去掉默认边距 */
+    html, body {
+      height: 100%;
       width: 100%;
+      margin: 0;
+      background: #000; /* PDF周围背景为黑，视觉更沉浸 */
     }
-
+    /* 全屏 PDF */
     .viewer-frame {
-      width: 100%;
-      max-width: 1100px;   /* 电脑端显示宽度 */
-      height: 90vh;        /* 显示区域高度 */
-      border: 1px solid var(--color-border);
-      border-radius: 12px;
-      box-shadow: var(--shadow-md);
+      position: fixed;
+      inset: 0;          /* top:0; right:0; bottom:0; left:0; 的缩写 */
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      z-index: 0;
+      background: #fff;
     }
-
-    .file-info {
-      margin-top: var(--space-5);
-      font-size: var(--fs-sm);
-      color: var(--color-muted);
-      text-align: center;
+    /* 左上角悬浮返回按钮（使用你CSS中的边框按钮风格） */
+    .overlay-controls {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 10;
+      display: flex;
+      gap: 10px;
     }
-
-    @media (max-width: 800px) {
-      .viewer-frame {
-        height: 75vh;
-        max-width: 95%;
-      }
+    /* 小尺寸边框按钮（与全站风格一致） */
+    .btn-outline-sm {
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      border-radius: 10px;
+    }
+    /* 在小屏上略微下移，避免挡住浏览器UI */
+    @media (max-width: 600px) {
+      .overlay-controls { top: 10px; left: 10px; }
     }
   </style>
 </head>
 <body>
-  <div id="site-header"></div>
+  <!-- 顶部悬浮控制（可按需增减） -->
+  <div class="overlay-controls">
+    <a href="./index.html" class="btn-outline btn-outline-sm" aria-label="化学トップへ戻る">← 化学トップへ</a>
+  </div>
 
-  <main class="site-main">
-    <section class="card max-w-content text-center">
-      <h2>学生用講義ファイル</h2>
-      <p class="text-muted">最新版の講義資料をオンラインで閲覧できます。</p>
-
-      <div class="viewer-container">
-        <iframe id="pdfViewer" class="viewer-frame" title="講義ファイルビューア"></iframe>
-        <div class="file-info" id="fileInfo"></div>
-      </div>
-
-      <div class="alert alert--info mt-6">
-        ※ 資料は学習目的にのみご利用ください。ダウンロードや再配布は禁止されています。
-      </div>
-    </section>
-  </main>
-
-  <div id="site-footer"></div>
+  <!-- 全屏PDF -->
+  <iframe id="pdfViewer" class="viewer-frame" title="講義ファイルビューア"></iframe>
 
   <script>
-    // ======== ここを変更すれば講義ファイルを差し替え可能 ========
-    const PDF_PATH = "../che/lectures/3物質量と化学反応式_1.pdf";  // ← ここを自分のファイルパスに変更
-    // ===============================================================
+    // ======== 只改这里即可换讲义文件 ========
+    const PDF_PATH = "../che/lectures/3物質量と化学反応式_1.pdf";
+    // ========================================
 
-    (async () => {
-      const hdr = await fetch('../common/header.html').then(r=>r.text()).catch(()=> '');
-      const ftr = await fetch('../common/footer.html').then(r=>r.text()).catch(()=> '');
-      document.getElementById('site-header').innerHTML = hdr;
-      document.getElementById('site-footer').innerHTML = ftr;
-
-      // PDFを読み込み
-      const viewer = document.getElementById('pdfViewer');
-      viewer.src = PDF_PATH;
-      document.getElementById('fileInfo').textContent = `現在表示中の資料： ${PDF_PATH.split('/').pop()}`;
-    })();
+    // 加载PDF
+    document.getElementById('pdfViewer').src = PDF_PATH;
   </script>
 </body>
 </html>

@@ -7,18 +7,12 @@
   <link rel="stylesheet" href="../common/style.css" />
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
       height: 100%;
-      background: #111;
-      color: #eee;
+      width: 100%;
+      margin: 0;
+      background: #000;
+      overflow: hidden;
       font-family: "Hiragino Kaku Gothic ProN", sans-serif;
-    }
-
-    body {
-      display: flex;
-      flex-direction: column;
     }
 
     /* 顶部返回按钮 */
@@ -26,7 +20,7 @@
       position: fixed;
       top: 14px;
       left: 14px;
-      z-index: 50;
+      z-index: 30;
     }
     .btn {
       display: inline-block;
@@ -40,68 +34,102 @@
       backdrop-filter: blur(4px);
       transition: background 0.2s;
     }
-    .btn:hover {
-      background: rgba(255,255,255,.2);
-    }
+    .btn:hover { background: rgba(255,255,255,.2); }
 
-    /* 主容器 */
-    #main {
-      width: 100%;
-      height: 100%;
-      box-sizing: border-box;
-      padding-top: 56px; /* 给返回按钮留空间 */
-    }
-
-    /* PDF 区域 */
+    /* PDF 容器（桌面用 iframe） */
     #pdfFrame {
-      width: 100%;
-      height: calc(100vh - 56px);
+      width: 100vw;
+      height: 100vh;
       border: none;
-      background: #222;
+      background: #fff;
     }
 
-    /* 错误信息 */
-    #error {
+    /* 加载遮罩 */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 14px;
+      color: #fff;
+      background: linear-gradient(135deg, rgba(0,0,0,.55), rgba(0,0,0,.35));
       text-align: center;
-      padding: 80px 16px 16px;
-      font-size: 0.95rem;
-      color: #f3f3f3;
+      padding: 24px;
+    }
+    .spin {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,.25);
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hint { opacity: .9; font-size: .95rem; }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-primary {
+      border-color: #4a90e2;
+      background: #4a90e2;
     }
   </style>
 </head>
 
 <body>
-  <!-- 顶部返回 -->
+  <!-- 顶部返回：自动回到对应列表 -->
   <div class="overlay">
     <a id="backBtn" class="btn">← 一覧に戻る</a>
   </div>
 
-  <div id="main">
-    <div id="error" style="display:none;"></div>
-    <iframe id="pdfFrame"></iframe>
+  <!-- PDF 区域（桌面端用） -->
+  <iframe id="pdfFrame" title="PDF Viewer"></iframe>
+
+  <!-- 加载指示 & 超时兜底 -->
+  <div id="loader" aria-live="polite" aria-busy="true">
+    <div class="spin" aria-hidden="true"></div>
+    <div id="loadMsg">講義ファイルを読み込み中です…</div>
+    <div class="hint" id="loadHint">通信状況により 1〜2 秒かかることがあります。</div>
+    <div class="actions" style="display:none" id="slowActions">
+      <a id="openDirect" class="btn btn-primary" target="_self">📄 直接開く</a>
+      <button id="retryBtn" class="btn">↻ 再読み込み</button>
+    </div>
   </div>
 
   <script>
-    // === 文件映射表 ===
+    // —— 映射表（相对 /che/viewer.html；注意没有 ../）——
     const FILES = {
       '2510_1': 'assets/lectures/2510/chem_1.pdf',
       '2510_2': 'assets/lectures/2510/chem_2.pdf',
+      '2510_2b': 'assets/lectures/2510/chem_2b.pdf',
       '2510_3': 'assets/lectures/2510/chem_3.pdf',
       '2510_hw1': 'assets/lectures/2510/hw_1.pdf',
       '2510_hw2a': 'assets/lectures/2510/hw_2a.pdf',
       '2510_hw2b': 'assets/lectures/2510/hw_2b.pdf',
       '2510_hw3': 'assets/lectures/2510/hw_3.pdf'
+      // 如果以后有 2507 的，也可以照样在这里继续加
     };
 
     const qs = new URLSearchParams(location.search);
     const id = qs.get('id') || '';
     const path = FILES[id];
 
-    const backBtn = document.getElementById('backBtn');
-    const pdfFrame = document.getElementById('pdfFrame');
-    const errorBox = document.getElementById('error');
+    const frame       = document.getElementById('pdfFrame');
+    const loader      = document.getElementById('loader');
+    const loadMsg     = document.getElementById('loadMsg');
+    const loadHint    = document.getElementById('loadHint');
+    const slowActions = document.getElementById('slowActions');
+    const openDirect  = document.getElementById('openDirect');
+    const retryBtn    = document.getElementById('retryBtn');
+    const backBtn     = document.getElementById('backBtn');
 
-    // === 返回目标自动识别 ===
+    // 返回目标：优先 referrer，再看 id 前缀
     let back = './lectures.html';
     const ref = document.referrer || '';
     if (ref.includes('list-2507.html')) back = './list-2507.html';
@@ -110,16 +138,66 @@
     else if (/^2510_/.test(id)) back = './list-2510.html';
     backBtn.href = back;
 
-    // === 设置 PDF ===
     if (!path) {
-      // 没有对应文件
-      pdfFrame.style.display = 'none';
-      errorBox.style.display = 'block';
-      errorBox.textContent = '❌ 対象のPDFが見つかりません。URLの「id」パラメータを確認してください。';
+      // 没有有效文件：直接给出提示和返回按钮
+      loadMsg.textContent = '対象の講義が見つかりません。';
+      loadHint.textContent = '一覧に戻って別の資料を選択してください。';
+      slowActions.style.display = 'flex';
+      openDirect.textContent = '← 一覧に戻る';
+      openDirect.href = back;
     } else {
       document.title = `講義ファイル (${id})｜学習小屋`;
-      // 直接使用浏览器 PDF 显示功能（自带下载按钮等）
-      pdfFrame.src = path;
+      openDirect.href = path;
+
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
+
+      if (isMobile) {
+        // —— 手机：直接用系统 PDF 查看器打开（最清晰、支持缩放、分页）——
+        loadMsg.textContent = 'モバイル環境のため、ネイティブビューアで開きます…';
+        // 同页面跳转到 PDF
+        location.replace(path);
+      } else {
+        // —— 桌面端：在 iframe 中内嵌 + 加载反馈 —— 
+        const t0 = performance.now();
+        frame.src = path;
+
+        // 3 秒仍未加载：提示“还在加载”，展示直链/重试
+        const slowTimer = setTimeout(() => {
+          loadMsg.textContent = 'まだ読み込み中です…';
+          loadHint.textContent = 'ネットワークが混み合っている可能性があります。下のボタンから直接開く/再読み込みもできます。';
+          slowActions.style.display = 'flex';
+        }, 3000);
+
+        // 10 秒仍未完成：强调兜底
+        const hardTimer = setTimeout(() => {
+          loadMsg.textContent = '読み込みに時間がかかっています。';
+          loadHint.textContent = '「📄 直接開く」を押すと同ページで表示します。';
+          slowActions.style.display = 'flex';
+        }, 10000);
+
+        // 加载完成：关闭遮罩
+        frame.addEventListener('load', () => {
+          clearTimeout(slowTimer);
+          clearTimeout(hardTimer);
+          loader.style.display = 'none';
+        });
+
+        // 失败兜底
+        frame.addEventListener('error', () => {
+          loadMsg.textContent = '読み込みに失敗しました。';
+          loadHint.textContent = '「📄 直接開く」または「↻ 再読み込み」をお試しください。';
+          slowActions.style.display = 'flex';
+        });
+
+        // 重试按钮：附带简单 cache-busting
+        retryBtn.addEventListener('click', () => {
+          slowActions.style.display = 'none';
+          loadMsg.textContent = '再読み込み中…';
+          const bust = (path.includes('?') ? '&' : '?') + 't=' + Date.now();
+          frame.src = path + bust;
+        });
+      }
     }
   </script>
 </body>

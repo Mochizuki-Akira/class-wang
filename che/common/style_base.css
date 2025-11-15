@@ -1,6 +1,6 @@
-/* ───────────────────────────────
-   🌈 基础主题
-─────────────────────────────── */
+/* common/style_base.css — theme + watermark + print rules */
+
+/* ───────── 基本主题 ───────── */
 html,body{
   background:#f6f8fb;
   color:#0f172a;
@@ -9,10 +9,10 @@ body{
   margin:0;
   line-height:1.8;
   font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans CJK JP",
-               system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+              system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
-/* Sticky Header */
+/* 顶部固定 header */
 header.site{
   position:sticky;
   top:0;
@@ -26,6 +26,7 @@ header.site{
   justify-content:space-between;
 }
 
+/* 通用按钮 */
 .btn{
   appearance:none;
   border:1px solid #e2e8f0;
@@ -42,98 +43,106 @@ header.site{
   border:none;
 }
 
-/* ======================================================================================
-   👩‍🏫 教师 / 学生模式（屏幕用）
-====================================================================================== */
-
-/* 学生模式：默认 */
+/* 学生 / 教师可见性 */
 .teacher-only{display:none;}
 .student-only{display:block;}
 
-/* 学生模式：禁止复制（屏幕） */
-body:not(.teacher-mode){
-  -webkit-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select:none;
-  user-select:none;
+/* ───────── 学生视图：浏览时的水印 ───────── */
+/* body 需要有 class="student"（你页面里已经在 JS 里加了） */
+/* 这里不包 @media，让它在屏幕 + 打印都存在：
+   Chrome → 每页都有水印；Safari → 只在某一页也接受 */
+body.student:not(.teacher-mode)::before{
+  content:"無断転載禁止\\A - WANG -";
+  white-space:pre;
+  position:fixed;
+  top:45%;
+  left:50%;
+  transform:translate(-50%,-50%) rotate(-30deg);
+  font-size:96px;
+  font-weight:900;
+  letter-spacing:8px;
+  color:rgba(0,0,0,0.06);
+  pointer-events:none;
+  z-index:9999;
 }
+
+/* 教师模式：去掉水印（只要 body.teacher-mode 就不会套上上面的选择器） */
+body.teacher-mode::before{
+  content:none !important;
+}
+
+/* ───────── 打印规则（隐藏 header、分页等） ───────── */
+@media print{
+
+  /* 隐藏顶部导航条 */
+  header.site{
+    display:none !important;
+  }
+
+  /* 打印时背景改成白色 */
+  body{
+    background:#fff;
+  }
+
+  /* 默认不打印 teacher-only（除非你单独用 print-teacher 之类 class 控制） */
+  .teacher-only{
+    display:none !important;
+    visibility:hidden !important;
+  }
+
+  /* 分页控制 */
+  .page-break-before{
+    break-before:page;
+    page-break-before:always;
+  }
+  .page-break-after{
+    break-after:page;
+    page-break-after:always;
+  }
+  .keep-together{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+  h1,h2,h3{
+    break-after:avoid-page;
+  }
+  table,figure,img{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  /* 打印时隐藏全局导航按钮（如果有的话） */
+  #global-nav-buttons{
+    display:none !important;
+  }
+}
+
+/* ───────────────────────────────
+   🔒 学生模式下：禁止复制 / 选择 / 图片拖拽
+   （仅屏幕生效，打印不受影响）
+─────────────────────────────── */
+body:not(.teacher-mode){
+  -webkit-user-select:none;  /* Chrome / Safari */
+  -moz-user-select:none;     /* Firefox */
+  -ms-user-select:none;      /* IE10+ */
+  user-select:none;          /* 标准 */
+  pointer-events:auto;
+}
+
+/* 学生模式：图片不能右键 / 拖拽（但仍可显示） */
 body:not(.teacher-mode) img{
   -webkit-user-drag:none;
   pointer-events:none;
 }
 
-/* 教师模式：允许选择 */
+/* 👩‍🏫 教师模式：恢复正常选择、复制 */
 body.teacher-mode{
   -webkit-user-select:text;
   user-select:text;
   pointer-events:auto;
 }
 
-/* ======================================================================================
-   🖨 打印专用水印（Chrome + Safari 完全兼容）
-====================================================================================== */
-
-/* 默认不显示水印（屏幕 */
-.print-watermark{
-  display:none;
-}
-
-/* 打印时出现（真实元素，不用伪元素，Safari 最稳） */
-@media print{
-  .print-watermark{
-    display:block !important;
-    position:fixed !important;
-    top:50% !important;
-    left:50% !important;
-    transform:translate(-50%,-50%) rotate(-30deg) !important;
-    font-size:72px !important;
-    font-weight:900 !important;
-    letter-spacing:6px !important;
-    color:rgba(0,0,0,0.10) !important;
-    white-space:nowrap !important;
-    pointer-events:none !important;
-    z-index:999999 !important;
-  }
-}
-
-/* ======================================================================================
-   🖨 打印优化（分页、隐藏、布局）
-====================================================================================== */
-@media print{
-  
-  /* 隐藏顶部导航 */
-  header.site{
-    display:none !important;
-  }
-
-  /* 默认隐藏教师内容（除非教师模式） */
-  body.print-student .teacher-only{
-    display:none !important;
-    visibility:hidden !important;
-  }
-
-  /* 教师模式打印保持教师内容可见 */
-  body.print-teacher .teacher-only{
-    display:block !important;
-    visibility:visible !important;
-  }
-
-  /* 版面控制 */
-  body{background:#fff;}
-  .page-break-before{break-before:page;page-break-before:always;}
-  .page-break-after{break-after:page;page-break-after:always;}
-  .keep-together{break-inside:avoid;page-break-inside:avoid;}
-
-  h1,h2,h3{break-after:avoid-page;}
-  table,figure,img{
-    break-inside:avoid;
-    page-break-inside:avoid;
-  }
-}
-
-/* ======================================================================================
-   🔙 全局导航按钮（可选）
-====================================================================================== */
+/* ───────── 全局导航按钮（可选功能）───────── */
 #global-nav-buttons{
   position:fixed;
   top:20px;
@@ -146,14 +155,17 @@ body.teacher-mode{
   padding:6px 12px;
   font-size:14px;
   background:#2563eb;
-  color:white;
+  color:#fff;
   border:none;
   border-radius:6px;
   cursor:pointer;
   font-weight:600;
 }
-.nav-btn:hover{background:#1e3ea8;}
+.nav-btn:hover{
+  background:#1e3ea8;
+}
 
+/* 打印时隐藏导航按钮（防止出现在试卷上） */
 @media print{
   #global-nav-buttons{
     display:none !important;

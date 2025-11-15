@@ -1,11 +1,18 @@
-/* common/style_base.css — theme + watermark (print) + print rules */
-html,body{background:#f6f8fb;color:#0f172a}
+/* ───────────────────────────────
+   🌈 基础主题
+─────────────────────────────── */
+html,body{
+  background:#f6f8fb;
+  color:#0f172a;
+}
 body{
   margin:0;
   line-height:1.8;
   font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans CJK JP",
-    system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif
+               system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
+
+/* Sticky Header */
 header.site{
   position:sticky;
   top:0;
@@ -16,8 +23,9 @@ header.site{
   padding:10px 24px;
   display:flex;
   align-items:center;
-  justify-content:space-between
+  justify-content:space-between;
 }
+
 .btn{
   appearance:none;
   border:1px solid #e2e8f0;
@@ -26,134 +34,128 @@ header.site{
   padding:8px 12px;
   border-radius:10px;
   cursor:pointer;
-  font-weight:600
+  font-weight:600;
 }
-.btn-primary{background:#2563eb;color:#fff;border:none}
+.btn-primary{
+  background:#2563eb;
+  color:#fff;
+  border:none;
+}
 
-.teacher-only{display:none}
-.student-only{display:block}
+/* ======================================================================================
+   👩‍🏫 教师 / 学生模式（屏幕用）
+====================================================================================== */
 
-/* ❌ 原来的：屏幕 + 打印都加水印（已删除）
-body.student::before{ ... }
-*/
+/* 学生模式：默认 */
+.teacher-only{display:none;}
+.student-only{display:block;}
 
-/* ✅ 新版：只在“打印时”加水印（学生 / 教师视图都覆盖） */
+/* 学生模式：禁止复制（屏幕） */
+body:not(.teacher-mode){
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+}
+body:not(.teacher-mode) img{
+  -webkit-user-drag:none;
+  pointer-events:none;
+}
+
+/* 教师模式：允许选择 */
+body.teacher-mode{
+  -webkit-user-select:text;
+  user-select:text;
+  pointer-events:auto;
+}
+
+/* ======================================================================================
+   🖨 打印专用水印（Chrome + Safari 完全兼容）
+====================================================================================== */
+
+/* 默认不显示水印（屏幕 */
+.print-watermark{
+  display:none;
+}
+
+/* 打印时出现（真实元素，不用伪元素，Safari 最稳） */
 @media print{
+  .print-watermark{
+    display:block !important;
+    position:fixed !important;
+    top:50% !important;
+    left:50% !important;
+    transform:translate(-50%,-50%) rotate(-30deg) !important;
+    font-size:72px !important;
+    font-weight:900 !important;
+    letter-spacing:6px !important;
+    color:rgba(0,0,0,0.10) !important;
+    white-space:nowrap !important;
+    pointer-events:none !important;
+    z-index:999999 !important;
+  }
+}
 
-  /* 打印样式基础设置 */
-  header.site{display:none!important}
-  .teacher-only{display:none!important}
-  body{background:#fff}
-  .page-break-before{break-before:page;page-break-before:always}
-  .page-break-after{break-after:page;page-break-after:always}
-  .keep-together{break-inside:avoid;page-break-inside:avoid}
-  h1,h2,h3{break-after:avoid-page}
-  table,figure,img{break-inside:avoid;page-break-inside:avoid}
+/* ======================================================================================
+   🖨 打印优化（分页、隐藏、布局）
+====================================================================================== */
+@media print{
+  
+  /* 隐藏顶部导航 */
+  header.site{
+    display:none !important;
+  }
 
-  /* 打印时隐藏右上角全局导航按钮 */
+  /* 默认隐藏教师内容（除非教师模式） */
+  body.print-student .teacher-only{
+    display:none !important;
+    visibility:hidden !important;
+  }
+
+  /* 教师模式打印保持教师内容可见 */
+  body.print-teacher .teacher-only{
+    display:block !important;
+    visibility:visible !important;
+  }
+
+  /* 版面控制 */
+  body{background:#fff;}
+  .page-break-before{break-before:page;page-break-before:always;}
+  .page-break-after{break-after:page;page-break-after:always;}
+  .keep-together{break-inside:avoid;page-break-inside:avoid;}
+
+  h1,h2,h3{break-after:avoid-page;}
+  table,figure,img{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+}
+
+/* ======================================================================================
+   🔙 全局导航按钮（可选）
+====================================================================================== */
+#global-nav-buttons{
+  position:fixed;
+  top:20px;
+  right:20px;
+  display:flex;
+  gap:10px;
+  z-index:99999;
+}
+.nav-btn{
+  padding:6px 12px;
+  font-size:14px;
+  background:#2563eb;
+  color:white;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:600;
+}
+.nav-btn:hover{background:#1e3ea8;}
+
+@media print{
   #global-nav-buttons{
-    display:none!important;
-  }
-
-  /* 🔒 默认（学生视图）：大号强水印 */
-  body:not(.teacher-mode)::before{
-    content:"無断転載禁止\\A - WANG --";
-    white-space:pre;
-    position:fixed;
-    top:45%;
-    left:50%;
-    transform:translate(-50%,-50%) rotate(-30deg);
-    font-size:96px;
-    font-weight:900;
-    letter-spacing:8px;
-    color:rgba(0,0,0,0.06);
-    pointer-events:none;
-    z-index:9999;
-  }
-
-  /* 👩‍🏫 教師用：可以稍微淡一点 / 换文案 */
-  body.teacher-mode::before{
-    content:"学習小屋 教師用控え";
-    white-space:pre;
-    position:fixed;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%) rotate(-30deg);
-    font-size:72px;
-    font-weight:800;
-    letter-spacing:4px;
-    color:rgba(0,0,0,0.04);
-    pointer-events:none;
-    z-index:9999;
-  }
-}
-
-/* ───────────────────────────────
-   🔒 学生模式下：禁止复制、选中、右键
-─────────────────────────────── */
-body:not(.teacher-mode) {
-  -webkit-user-select: none;  /* 禁止文字选择（Chrome / Safari）*/
-  -moz-user-select: none;     /* 禁止文字选择（Firefox）*/
-  -ms-user-select: none;      /* 禁止文字选择（IE10+）*/
-  user-select: none;          /* 禁止文字选择（标准）*/
-  pointer-events: auto;
-}
-
-/* 禁止图片拖拽与右键 */
-body:not(.teacher-mode) img {
-  -webkit-user-drag: none;
-  pointer-events: none;
-}
-
-/* ───────────────────────────────
-   👩‍🏫 教师模式下：恢复正常选择与复制
-─────────────────────────────── */
-body.teacher-mode {
-  -webkit-user-select: text;
-  user-select: text;
-  pointer-events: auto;
-}
-
-/* =====================================
-   全局导航按钮（返回上一页 / 回主页面）
-===================================== */
-#global-nav-buttons {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  gap: 10px;
-  z-index: 99999;
-}
-
-.nav-btn {
-  padding: 6px 12px;
-  font-size: 14px;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.nav-btn:hover {
-  background: #1e3ea8;
-}
-
-/* === DEBUG: 强制打印水印（最低条件版本） === */
-@media print {
-  body::before {
-    content: "TEST WATERMARK - WANG -";
-    white-space: pre;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-30deg);
-    font-size: 80px;
-    font-weight: 900;
-    color: rgba(0,0,0,0.12);
-    z-index: 999999;
-    pointer-events: none;
+    display:none !important;
   }
 }

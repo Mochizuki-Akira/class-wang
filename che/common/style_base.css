@@ -6,10 +6,9 @@ header.site{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px s
 .btn-primary{background:#2563eb;color:#fff;border:none}
 .teacher-only{display:none}
 .student-only{display:block}
-
-/* Watermark in student mode（浏览时水印） */
+/* Watermark in student mode */
 body.student::before{
-  content: "無断転載禁止 \\A - WANG -";
+  content: "無断転載禁止\A - WANG -";
   white-space: pre;
   position:fixed;
   top:45%;left:50%;
@@ -21,7 +20,6 @@ body.student::before{
   pointer-events:none;
   z-index:9999;
 }
-
 /* Print rules */
 @media print{
   header.site{display:none!important}
@@ -32,24 +30,7 @@ body.student::before{
   .keep-together{break-inside:avoid;page-break-inside:avoid}
   h1,h2,h3{break-after:avoid-page}
   table,figure,img{break-inside:avoid;page-break-inside:avoid}
-
-  /* 🔁 打印时再次声明水印（保证打印时也画出来） */
-  body.student::before{
-    content: "無断転載禁止 \\A - WANG -";
-    white-space: pre;
-    position:fixed;
-    top:45%;left:50%;
-    transform:translate(-50%,-50%) rotate(-30deg);
-    font-size:96px;
-    font-weight:900;
-    letter-spacing:8px;
-    color:rgba(0,0,0,0.10);  /* 打印稍微深一点 */
-    pointer-events:none;
-    z-index:9999;
-    display:block;
-  }
 }
-
 /* ───────────────────────────────
    🔒 学生模式下：禁止复制、选中、右键
 ─────────────────────────────── */
@@ -75,7 +56,6 @@ body.teacher-mode {
   user-select: text;
   pointer-events: auto;
 }
-
 /* =====================================
    全局导航按钮（返回上一页 / 回主页面）
 ===================================== */

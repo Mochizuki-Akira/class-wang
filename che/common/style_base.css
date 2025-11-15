@@ -9,7 +9,7 @@ header.site{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px s
 
 /* Watermark in student mode（浏览时水印） */
 body.student::before{
-  content: "無断転載禁止\\A - WANG -";
+  content: "無断転載禁止 \\A - WANG -";
   white-space: pre;
   position:fixed;
   top:45%;left:50%;
@@ -35,7 +35,7 @@ body.student::before{
 
   /* 🔁 打印时再次声明水印（保证打印时也画出来） */
   body.student::before{
-    content: "無断転載禁止\A - WANG -";
+    content: "無断転載禁止 \\A - WANG -";
     white-space: pre;
     position:fixed;
     top:45%;left:50%;

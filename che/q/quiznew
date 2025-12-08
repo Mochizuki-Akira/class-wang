@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>問題確認コード作成ページ</title>
+
+  <!-- 共通スタイル -->
+  <link rel="stylesheet" href="../../common/style.css">
+
+  <!-- このページ専用の軽い調整 -->
+  <style>
+    body {
+      background: #f9f9f9;
+      font-family: sans-serif;
+    }
+
+    main.quiz-main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1.quiz-title {
+      color: #003366;
+      margin-bottom: 10px;
+      font-size: 1.6rem;
+    }
+
+    .section {
+      background: #fff;
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px #ccc;
+    }
+
+    .section h2 {
+      color: #003366;
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+
+    .question {
+      margin: 8px 0;
+    }
+
+    .options label {
+      margin-right: 10px;
+    }
+
+    .result {
+      margin-left: 10px;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    button.quiz-btn {
+      padding: 8px 16px;
+      margin-top: 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #codeArea {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    #qrcode {
+      margin-top: 15px;
+    }
+
+    #copyBtn {
+      margin-left: 10px;
+      padding: 4px 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+
+  <!-- QRコードライブラリ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+  <script>
+    // --- 共通：ヘッダー・フッター読み込み ---
+    async function loadCommonLayout() {
+      const headerEl = document.getElementById('site-header');
+      const footerEl = document.getElementById('site-footer');
+
+      try {
+        const [headerHtml, footerHtml] = await Promise.all([
+          fetch('../../common/header.html').then(r => r.text()),
+          fetch('../../common/footer.html').then(r => r.text())
+        ]);
+        headerEl.innerHTML = headerHtml;
+        footerEl.innerHTML = footerHtml;
+      } catch (e) {
+        console.error('ヘッダー／フッターの読み込みに失敗しました:', e);
+      }
+    }
+
+    // --- 元のコード：クイズ部分 ---
+    function getQueryParam(name) {
+      const url = new URL(location.href);
+      return url.searchParams.get(name);
+    }
+
+    async function initQuiz() {
+      const chapter = getQueryParam('chapter') || 'ch1';
+      const script = document.createElement('script');
+      script.src = `data-${chapter}.js`;
+      document.head.appendChild(script);
+      script.onload = () => renderQuiz(window.chapterData);
+    }
+
+    function renderQuiz(data) {
+      document.title = data.title;
+
+      const pageTitle = document.getElementById('pageTitle');
+      if (pageTitle) pageTitle.textContent = data.title;
+
+      const form = document.getElementById('quizForm');
+      const answers = {};
+
+      data.sections.forEach(section => {
+        const sec = document.createElement('div');
+        sec.className = 'section';
+        sec.innerHTML = `<h2>${section.subtitle}</h2>`;
+
+        section.questions.forEach((q) => {
+          answers[q.name] = q.answer;
+          const qdiv = document.createElement('div');
+          qdiv.className = 'question';
+
+          const optionsHtml = [...Array(6)].map((_, j) =>
+            `<label><input type="radio" name="${q.name}" value="${j + 1}">${j + 1}</label>`
+          ).join(' ');
+
+          qdiv.innerHTML =
+            `${q.label}：${optionsHtml} ` +
+            `<span class="result" id="r-${q.name}"></span>`;
+
+          sec.appendChild(qdiv);
+        });
+
+        form.appendChild(sec);
+      });
+
+      const submitBtn = document.createElement('button');
+      submitBtn.type = 'submit';
+      submitBtn.textContent = '答え合わせ';
+      submitBtn.className = 'quiz-btn';
+      form.appendChild(submitBtn);
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        let bin = '';
+        for (const key in answers) {
+          const sel = document.querySelector(`input[name="${key}"]:checked`);
+          const result = document.getElementById(`r-${key}`);
+          if (sel && parseInt(sel.value, 10) === answers[key]) {
+            result.textContent = '✅';
+            result.style.color = 'green';
+            bin += '1';
+          } else {
+            result.textContent = sel ? '❌' : '未選択';
+            result.style.color = sel ? 'red' : 'gray';
+            bin += '0';
+          }
+        }
+        const full = '1' + bin;
+        const code = BigInt('0b' + full).toString();
+        document.getElementById('resultCode').textContent = code;
+        generateQR(code);
+      });
+
+      document.getElementById('copyBtn').addEventListener('click', () => {
+        const code = document.getElementById('resultCode').textContent;
+        if (code.includes('生成されていません')) {
+          alert('まだコードが生成されていません。');
+          return;
+        }
+        const full = '問題確認コード：' + code;
+        navigator.clipboard.writeText(full)
+          .then(() => alert('コピーしました！\n\n' + full))
+          .catch(err => alert('コピー失敗: ' + err));
+      });
+    }
+
+    function generateQR(text) {
+      const qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = '';
+      const qr = new QRious({
+        element: document.createElement('canvas'),
+        value: text,
+        size: 200,
+        background: 'white',
+        foreground: '#003366'
+      });
+      qrContainer.appendChild(qr.element);
+    }
+
+    // ページ読み込み時：共通レイアウト → クイズ初期化
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadCommonLayout();
+      await initQuiz();
+    });
+  </script>
+</head>
+<body>
+  <!-- 共通ヘッダー挿入位置 -->
+  <div id="site-header"></div>
+
+  <main class="quiz-main">
+    <h1 id="pageTitle" class="quiz-title">問題確認コード作成ページ</h1>
+
+    <form id="quizForm"></form>
+
+    <div id="codeArea">
+      問題確認コード：
+      <code id="resultCode">（まだ生成されていません）</code>
+      <button id="copyBtn" type="button">📋 コピー</button>
+      <div id="qrcode"></div>
+    </div>
+  </main>
+
+  <!-- 共通フッター挿入位置 -->
+  <div id="site-footer"></div>
+</body>
+</html>

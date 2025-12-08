@@ -205,6 +205,30 @@ hr{
 }
 h1,h2,h3{clear:both}
 </style>
+<style>
+  /* === 教師向け：学生には空白として見えるメモ === */
+.teacher-note-blank {
+  display: block;
+  margin: 12px 0;
+  position: relative;
+}
+
+/* 教師模式：正常显示文字 */
+.teacher-mode .teacher-note-blank {
+  color: #0f172a !important;
+  height: auto !important;
+  border-bottom: none !important;
+  text-decoration-line:underline;
+}
+
+/* 学生模式：内容隐藏 + 留白 */
+.student .teacher-note-blank {
+  color: transparent !important;   /* 文字不可见 */
+  height: 16em !important;          /* ← 空白高度，可自定义 */
+  border-bottom: 1px dotted #cbd5e1; 
+  margin: 16px 0;
+}
+</style>
 </head>
 <body class="student">
 <header class="site">
@@ -345,6 +369,30 @@ h1,h2,h3{clear:both}
   <p>2 つ以上の酸性・塩基性溶液を混合するとき，[H⁺]（または [OH⁻]）の全量から pH を求める。</p>
   <p><strong>例：</strong> pH=2.0 の塩酸 10 mL と pH=3.0 の塩酸 20 mL を混合した水溶液の pH を求めよ。ただし、log<sub>10</sub>2=0.30とする。</p>
 
+  <h4>(3) 電離平衡と電離定数</h4>
+  <p>弱酸・弱塩基は，水溶液中で一部だけが電離し<strong>電離平衡</strong>の状態にある。このときの平衡定数を<strong>電離定数</strong>という。</p>
+  <ul>
+    <li>酸の電離定数：K<sub>a</sub></li>
+    <li>塩基の電離定数：K<sub>b</sub></li>
+    <p>温度が変わらなければ、その酸・塩基に固有の値になる。</p>
+  </ul>
+
+  <p>例：酢酸 CH<sub>3</sub>COOH の電離</p>
+  <p style="margin-left:1.5em;">CH<sub>3</sub>COOH ⇄ CH<sub>3</sub>COO<sup>−</sup> + H<sup>+</sup></p>
+  <p>弱酸 HA の初濃度を c（mol/L），電離度を α とすると，平衡時 K<sub>a</sub></p>
+  <div class="teacher-note-blank">
+   <p>Ka=[CH3COO-][H+]/[CH3COOH] </p>
+  
+    <p>K<sub>a</sub> = [H<sup>+</sup>][A<sup>−</sup>]/[HA] ≒ cα<sup>2</sup></p>
+  </div>
+
+  <figure>
+    <img src="assets/808.png" alt="図 808 電離平衡とpH計算の例題" class="h-6lines">
+    <figcaption>図 808　電離平衡と pH 計算の例題</figcaption>
+  </figure>
+  <div class="teacher-note-blank">
+   
+  </div>
   <hr/>
 
   <!-- 三、中和反応と塩の生成 -->
@@ -411,6 +459,104 @@ h1,h2,h3{clear:both}
     <img src="assets/810.png" alt="図 810 緩衝溶液の例題" class="h-14lines">
     <figcaption>図 810　緩衝溶液と酸塩基平衡の例題</figcaption>
   </figure>
+  <h3>8. 中和実験操作</h3>
+
+<p>
+中和滴定は，酸と塩基が当量関係で反応する点（当量点）を，
+指示薬の変色などから求める定量分析である。
+正確な結果を得るためには，各器具の役割と操作方法を正しく理解することが重要である。
+</p>
+
+<h4>① 使用器具とその役割</h4>
+<ul>
+  <li>
+    <strong>ホールピペット</strong><br>
+    濃度未知の溶液を正確な体積で量り取るための器具。
+  </li>
+  <li>
+    <strong>メスフラスコ（容量瓶）</strong><br>
+    一定体積となるように溶液を配制・希釈する器具。
+    主に標準溶液の調製に用いられる。
+  </li>
+  <li>
+    <strong>コニカルビーカー</strong><br>
+    ホールピペットで量り取った濃度未知溶液を入れ，
+    滴定操作を行う反応容器。
+  </li>
+  <li>
+    <strong>ビュレット</strong><br>
+    濃度既知の標準溶液を少量ずつ滴下し，
+    滴下した体積を正確に読み取るための器具。
+  </li>
+  
+</ul>
+
+<figure>
+  <img src="assets/811.png" alt="図 811" class="h-6lines">
+  <figcaption>図 811　</figcaption>
+</figure>
+
+<h4>② 基本的な操作手順</h4>
+<ol>
+  <li>
+    ホールピペットを用いて，濃度未知の溶液を一定体積，
+    三角フラスコに量り取る。
+  </li>
+  <li>
+    フラスコ内に適切な指示薬を数滴加える。
+  </li>
+  <li>
+    ビュレットに標準溶液を入れ，初期目盛を読む。
+  </li>
+  <li>
+    フラスコ内を攪拌しながら，標準溶液をビュレットから滴下する。
+  </li>
+  <li>
+    指示薬の色が変化し，その色が持続した点を終点とする。
+  </li>
+  <li>
+    ビュレットの目盛から使用した標準溶液の体積を求め，
+    未知溶液の濃度を計算する。
+  </li>
+</ol>
+
+<h4>③ 操作上の注意</h4>
+<ul>
+  <li>ビュレットおよびホールピペットは使用前に共洗いを行う</li>
+  <li>目盛は視線を水平にして読み取る</li>
+  <li>終点付近では滴下量をできるだけ小さくする</li>
+</ul>
+
+<h3>9. 中和曲線</h3>
+
+<p>
+中和曲線とは，一定量の酸または塩基に対して，
+相手の溶液を徐々に加えたときの pH の変化を表したグラフである。
+横軸に加えた溶液の体積，縦軸に pH をとる。
+</p>
+
+<h4>① 強酸－強塩基の中和</h4>
+<ul>
+  <li>中和における pH はほぼ 7 となる</li>
+  <li>中和点付近で pH が急激に変化する</li>
+</ul>
+
+<h4>② 弱酸－強塩基の中和</h4>
+<ul>
+  <li>中和点の pH は 7 より大きい</li>
+</ul>
+
+<h4>③ 弱塩基－強酸の中和</h4>
+<ul>
+  <li>中和点の pH は 7 より小さい</li>
+</ul>
+
+<h4>④ 指示薬の選択</h4>
+<p>
+中和曲線における急激な pH 変化の範囲と，
+指示薬の変色域が一致するものを選ぶ必要がある。
+例：弱酸－強塩基の中和では，フェノールフタレインがよく用いられる。
+</p>
   <hr/>
 
 </main>
